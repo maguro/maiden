@@ -17,7 +17,9 @@
 
     <modules>
         <module>agent</module>
+        <module>assemble</module>
         <module>model</module>
+        <module>tests</module>
     </modules>
 
     <properties>
@@ -57,15 +59,33 @@
         <dependencies>
 
             <dependency>
-	            <groupId>com.toolazydogs.maiden</groupId>
-	            <artifactId>model</artifactId>
+                <groupId>asm</groupId>
+                <artifactId>asm</artifactId>
+                <version>3.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.toolazydogs.maiden</groupId>
+                <artifactId>agent</artifactId>
                 <version>${pom.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.8.1</version>
+                <groupId>com.toolazydogs.maiden</groupId>
+                <artifactId>assemble</artifactId>
+                <version>${pom.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.toolazydogs.maiden</groupId>
+                <artifactId>model</artifactId>
+                <version>${pom.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.testng</groupId>
+                <artifactId>testng</artifactId>
+                <version>5.14</version>
                 <scope>test</scope>
             </dependency>
 
@@ -82,8 +102,8 @@
     <dependencies>
 
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -125,6 +145,21 @@
         <connection>scm:git:git://github.com/maguro/maiden.git</connection>
         <url>scm:git:git://github.com/maguro/maiden.git</url>
     </scm>
+
+    <profiles>
+
+        <!-- testing profile -->
+        <profile>
+            <id>tests</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <module>tests</module>
+            </modules>
+        </profile>
+
+    </profiles>
 
 </project>
 

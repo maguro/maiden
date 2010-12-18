@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 
 
 /**
- * @version $Revision: $ $Date: $
+ * An agent that registers the Iron Maiden's class transformer.
  */
 public class IronAgent
 {
@@ -29,18 +29,40 @@ public class IronAgent
     private final static Logger LOGGER = Logger.getLogger(CLASS_NAME);
     private static Instrumentation INSTRUMENTATION;
 
-    public static void premain(String args, Instrumentation instrumentation)
+    /**
+     * After the Java Virtual Machine (JVM) has initialized, the premain method
+     * will be called in the order the agents were specified, then the real
+     * application main method will be called. Each premain method must return
+     * in order for the startup sequence to proceed.
+     *
+     * @param agentArgs       the options passed on the javaagent commandline
+     * @param instrumentation provides services needed to instrument Java programming language code
+     */
+    public static void premain(String agentArgs, Instrumentation instrumentation)
     {
+        LOGGER.entering(CLASS_NAME, "premain", new Object[]{agentArgs, instrumentation});
+
         INSTRUMENTATION = instrumentation;
+
+        instrumentation.addTransformer(new IronTransformer());
+
+        LOGGER.exiting(CLASS_NAME, "premain");
     }
 
-    public static void agentmain(String args, Instrumentation instrumentation) throws Exception
+    /**
+     * This method is called after the JVM has been started and the application main method was called.
+     *
+     * @param agentArgs       the options passed when loading the agent into the VM at runtime, see {@link IronAgentLoader#loadAgent(String, String)}
+     * @param instrumentation provides services needed to instrument Java programming language code
+     */
+    public static void agentmain(String agentArgs, Instrumentation instrumentation)
     {
-        INSTRUMENTATION = instrumentation;
-    }
+        LOGGER.entering(CLASS_NAME, "agentmain", new Object[]{agentArgs, instrumentation});
 
-    public static void initialize()
-    {
-        //Todo change body of created methods use File | Settings | File Templates.
+        INSTRUMENTATION = instrumentation;
+
+        instrumentation.addTransformer(new IronTransformer());
+
+        LOGGER.exiting(CLASS_NAME, "agentmain");
     }
 }
