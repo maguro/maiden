@@ -2,6 +2,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.toolazydogs</groupId>
+        <artifactId>root</artifactId>
+        <version>1</version>
+    </parent>
+    
     <groupId>com.toolazydogs.maiden</groupId>
     <artifactId>maiden-project</artifactId>
     <name>Iron Maiden :: Project</name>
@@ -19,10 +26,10 @@
         <module>agent</module>
         <module>assemble</module>
         <module>model</module>
-        <module>tests</module>
     </modules>
 
     <properties>
+        <asmVersion>3.2</asmVersion>
     </properties>
 
     <build>
@@ -61,7 +68,13 @@
             <dependency>
                 <groupId>asm</groupId>
                 <artifactId>asm</artifactId>
-                <version>3.0</version>
+                <version>${asmVersion}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>asm</groupId>
+                <artifactId>asm-util</artifactId>
+                <version>${asmVersion}</version>
             </dependency>
 
             <dependency>
@@ -114,32 +127,6 @@
         </dependency>
 
     </dependencies>
-
-    <repositories>
-        <repository>
-            <id>maiden-dist-m2-snapshots</id>
-            <url>http://oss.sonatype.org/content/repositories/maiden-snapshots/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>maiden-dist-m2-snapshots</id>
-            <url>http://oss.sonatype.org/content/repositories/maiden-snapshots/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
 
     <scm>
         <connection>scm:git:git://github.com/maguro/maiden.git</connection>
