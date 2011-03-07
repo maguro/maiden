@@ -16,6 +16,15 @@
     <build>
         <plugins>
             <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <forkMode>pertest</forkMode>
+                    <argLine>-Xbootclasspath/a:target/agent.jar -javaagent:target/agent.jar</argLine>
+                    <forkMode>once</forkMode>
+                </configuration>
+            </plugin>
+
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
@@ -48,6 +57,12 @@
         <dependency>
             <groupId>com.toolazydogs.maiden</groupId>
             <artifactId>agent</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.toolazydogs.maiden</groupId>
+            <artifactId>assemble</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

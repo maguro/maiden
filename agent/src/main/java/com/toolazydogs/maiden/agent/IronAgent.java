@@ -1,6 +1,6 @@
 /**
  *
- * Copyright 2010 (C) The original author or authors
+ * Copyright 2010-2011 (C) The original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,14 @@
 package com.toolazydogs.maiden.agent;
 
 import java.lang.instrument.Instrumentation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.toolazydogs.maiden.agent.api.Dispatcher;
+import com.toolazydogs.maiden.agent.transformers.IronTransformer;
 
 
 /**
@@ -25,9 +32,9 @@ import java.util.logging.Logger;
  */
 public class IronAgent
 {
+    public final static String DISPATCHER_CLASS = "dispatcher";
     private final static String CLASS_NAME = IronAgent.class.getName();
     private final static Logger LOGGER = Logger.getLogger(CLASS_NAME);
-    private static Instrumentation INSTRUMENTATION;
 
     /**
      * After the Java Virtual Machine (JVM) has initialized, the premain method
@@ -42,9 +49,7 @@ public class IronAgent
     {
         LOGGER.entering(CLASS_NAME, "premain", new Object[]{agentArgs, instrumentation});
 
-        INSTRUMENTATION = instrumentation;
-
-        instrumentation.addTransformer(new IronTransformer());
+        sharedmain(agentArgs, instrumentation);
 
         LOGGER.exiting(CLASS_NAME, "premain");
     }
@@ -59,10 +64,82 @@ public class IronAgent
     {
         LOGGER.entering(CLASS_NAME, "agentmain", new Object[]{agentArgs, instrumentation});
 
-        INSTRUMENTATION = instrumentation;
-
-        instrumentation.addTransformer(new IronTransformer());
+        sharedmain(agentArgs, instrumentation);
 
         LOGGER.exiting(CLASS_NAME, "agentmain");
+    }
+
+    /**
+     * @param agentArgs       arguments for the agent
+     * @param instrumentation provides services needed to instrument Java programming language code
+     */
+    @SuppressWarnings({"unchecked"})
+    public static void sharedmain(String agentArgs, Instrumentation instrumentation)
+    {
+        LOGGER.entering(CLASS_NAME, "sharedmain", new Object[]{agentArgs, instrumentation});
+
+        if (agentArgs == null) agentArgs = "";
+
+        String dn = DefaultDispatcher.class.getName();
+        Properties properties = new Properties();
+        for (String arg : agentArgs.split(","))
+        {
+            String[] keyValue = arg.split("=");
+            if (keyValue.length == 2)
+            {
+                if (DISPATCHER_CLASS.equalsIgnoreCase(keyValue[0])) dn = keyValue[1];
+                else properties.put(keyValue[0], keyValue[1]);
+            }
+            else
+            {
+                LOGGER.warning("Argument not valid format " + arg);
+            }
+        }
+
+        try
+        {
+            Class<Dispatcher> dc;
+            ClassLoader dcl = IronAgent.class.getClassLoader();
+            if (dcl == null)
+            {
+                dc = (Class<Dispatcher>)Class.forName(dn);
+            }
+            else
+            {
+                dc = (Class<Dispatcher>)dcl.loadClass(dn);
+            }
+
+            Constructor<Dispatcher> constructor = dc.getConstructor(Properties.class);
+            Dispatcher dispatcher = constructor.newInstance(properties);
+
+            instrumentation.addTransformer(new IronTransformer(dispatcher));
+        }
+        catch (ClassNotFoundException e)
+        {
+            LOGGER.log(Level.SEVERE, "Unable to find class " + dn, e);
+            throw new RuntimeException("Unable to find class " + dn, e);
+        }
+        catch (NoSuchMethodException e)
+        {
+            LOGGER.log(Level.SEVERE, "Unable to construct " + dn, e);
+            throw new RuntimeException("Unable to construct " + dn, e);
+        }
+        catch (InvocationTargetException e)
+        {
+            LOGGER.log(Level.SEVERE, "Unable to construct " + dn, e);
+            throw new RuntimeException("Unable to construct " + dn, e);
+        }
+        catch (InstantiationException e)
+        {
+            LOGGER.log(Level.SEVERE, "Unable to instantiate " + dn, e);
+            throw new RuntimeException("Unable to instantiate " + dn, e);
+        }
+        catch (IllegalAccessException e)
+        {
+            LOGGER.log(Level.SEVERE, "Unable to instantiate " + dn, e);
+            throw new RuntimeException("Unable to instantiate " + dn, e);
+        }
+
+        LOGGER.exiting(CLASS_NAME, "sharedmain");
     }
 }

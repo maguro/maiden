@@ -56,6 +56,11 @@
             <artifactId>agent</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.toolazydogs.maiden</groupId>
+            <artifactId>model</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

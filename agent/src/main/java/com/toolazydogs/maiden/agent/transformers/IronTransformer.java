@@ -1,6 +1,6 @@
 /**
  *
- * Copyright 2010 (C) The original author or authors
+ * Copyright 2010-2011 (C) The original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.toolazydogs.maiden.agent;
+package com.toolazydogs.maiden.agent.transformers;
 
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
 import java.util.logging.Logger;
 
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
+
+import com.toolazydogs.maiden.agent.api.Dispatcher;
 
 
 /**
@@ -33,19 +33,25 @@ public class IronTransformer implements ClassFileTransformer, Opcodes
 {
     private final static String CLASS_NAME = IronTransformer.class.getName();
     private final static Logger LOGGER = Logger.getLogger(CLASS_NAME);
+    private final Dispatcher dispatcher;
+
+    public IronTransformer(Dispatcher dispatcher)
+    {
+        assert dispatcher != null;
+
+        this.dispatcher = dispatcher;
+    }
 
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException
     {
         LOGGER.entering(CLASS_NAME, "transform", new Object[]{loader, className, classBeingRedefined, protectionDomain, classfileBuffer});
 
-        ClassReader reader = new ClassReader(classfileBuffer);
-        ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES & ClassWriter.COMPUTE_MAXS);
-        reader.accept(writer, ClassReader.EXPAND_FRAMES);
+        ClassFileTransformer transformer = dispatcher.lookup(loader, className, classBeingRedefined, protectionDomain);
 
-        System.out.println("FOO " + className);
+        byte[] results = transformer.transform(loader, className, classBeingRedefined, protectionDomain, classfileBuffer);
 
-        LOGGER.exiting(CLASS_NAME, "transform", classfileBuffer);
+        LOGGER.exiting(CLASS_NAME, "transform", results);
 
-        return writer.toByteArray();
+        return results;
     }
 }

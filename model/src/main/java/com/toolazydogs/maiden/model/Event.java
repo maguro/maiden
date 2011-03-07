@@ -16,31 +16,21 @@
  */
 package com.toolazydogs.maiden.model;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Logger;
-
-
 /**
- * The runtime representation of an object.
+ *
  */
-public class IronObject extends Base
+public abstract class Event
 {
-    private final static String CLASS_NAME = IronObject.class.getName();
-    private final static Logger LOGGER = Logger.getLogger(CLASS_NAME);
-    private final Map<String, Object> fields = new HashMap<String, Object>();
+    private final Line line;
 
-    public void setField(String name, Object value)
+    protected Event(Line line)
     {
-        assert name != null;
-
-        fields.put(name, value);
+        assert line != null;
+        this.line = line;
     }
 
-    public Object getField(String name)
+    public Line getLine()
     {
-        assert name != null;
-
-        return fields.get(name);
+        return line;
     }
 }

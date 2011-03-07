@@ -1,6 +1,6 @@
 /**
  *
- * Copyright 2010-2011 (C) The original author or authors
+ * Copyright 2011 (C) The original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.toolazydogs.maiden.tests;
+package com.toolazydogs.maiden.agent.asm.delay;
 
-import org.testng.annotations.Test;
-
-import com.toolazydogs.maiden.IronMaiden;
-import com.toolazydogs.maiden.agent.IronAgentLoader;
+import org.objectweb.asm.MethodVisitor;
 
 
 /**
- * Test runtime loading of java agent
+ * Implementations of this interface delay visiting of their delegates until
+ * the method {@link #flush(org.objectweb.asm.MethodVisitor, boolean)} is
+ * called.
  */
-public class RuntimeTest
+public interface DelayedMethodVisitor
 {
-    @Test
-    public void test() throws Exception
-    {
-        IronMaiden.announceLineNumber(4);
-        IronAgentLoader.loadAgent("target/agent.jar", "test,args,in,list");
-    }
+    void flush(MethodVisitor methodVisitor, boolean mark);
 }

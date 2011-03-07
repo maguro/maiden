@@ -19,7 +19,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <forkMode>pertest</forkMode>
-                    <argLine>-javaagent:target/agent.jar</argLine>
+                    <argLine>-Xbootclasspath/a:target/agent.jar -javaagent:target/agent.jar</argLine>
                     <forkMode>once</forkMode>
                 </configuration>
             </plugin>
@@ -53,5 +53,33 @@
 
         </plugins>
     </build>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm-analysis</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm-util</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.toolazydogs.maiden</groupId>
+            <artifactId>assemble</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
 
 </project>

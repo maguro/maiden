@@ -14,23 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.toolazydogs.maiden.tests;
+package com.toolazydogs.maiden.agent.api;
 
-import org.testng.annotations.Test;
-
-import com.toolazydogs.maiden.IronMaiden;
-import com.toolazydogs.maiden.agent.IronAgentLoader;
+import java.lang.instrument.ClassFileTransformer;
+import java.security.ProtectionDomain;
 
 
 /**
- * Test runtime loading of java agent
+ *
  */
-public class RuntimeTest
+public interface Dispatcher
 {
-    @Test
-    public void test() throws Exception
-    {
-        IronMaiden.announceLineNumber(4);
-        IronAgentLoader.loadAgent("target/agent.jar", "test,args,in,list");
-    }
+    ClassFileTransformer lookup(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain);
 }

@@ -1,6 +1,6 @@
 /**
  *
- * Copyright 2010-2011 (C) The original author or authors
+ * Copyright 2011 (C) The original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.toolazydogs.maiden.tests;
+package com.toolazydogs.maiden.agent.asm;
 
-import org.testng.annotations.Test;
-
-import com.toolazydogs.maiden.IronMaiden;
-import com.toolazydogs.maiden.agent.IronAgentLoader;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 
 
 /**
- * Test runtime loading of java agent
+ *
  */
-public class RuntimeTest
+public class AsmUtils
 {
-    @Test
-    public void test() throws Exception
+    public static void pushInteger(MethodVisitor methodVisitor, int value)
     {
-        IronMaiden.announceLineNumber(4);
-        IronAgentLoader.loadAgent("target/agent.jar", "test,args,in,list");
+        if (Byte.MIN_VALUE <= value && value <= Byte.MAX_VALUE) methodVisitor.visitIntInsn(Opcodes.BIPUSH, value);
+        else if (Short.MIN_VALUE <= value && value <= Short.MAX_VALUE) methodVisitor.visitIntInsn(Opcodes.SIPUSH, value);
     }
 }

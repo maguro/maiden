@@ -1,6 +1,6 @@
 /**
  *
- * Copyright 2010-2011 (C) The original author or authors
+ * Copyright 2011 (C) The original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.toolazydogs.maiden.tests;
-
-import org.testng.annotations.Test;
-
-import com.toolazydogs.maiden.IronMaiden;
-import com.toolazydogs.maiden.agent.IronAgentLoader;
-
+package com.toolazydogs.maiden.model;
 
 /**
- * Test runtime loading of java agent
+ *
  */
-public class RuntimeTest
+public class Line
 {
-    @Test
-    public void test() throws Exception
+    private final String file;
+    private final int line;
+
+    public Line(String file, int line)
     {
-        IronMaiden.announceLineNumber(4);
-        IronAgentLoader.loadAgent("target/agent.jar", "test,args,in,list");
+        this.file = file;
+        this.line = line;
+    }
+
+    public String getFile()
+    {
+        return file;
+    }
+
+    public int getLine()
+    {
+        return line;
     }
 }
