@@ -31,6 +31,10 @@ public class DoNothingTransformer implements ClassFileTransformer
     private final static String CLASS_NAME = DoNothingTransformer.class.getName();
     private final static Logger LOGGER = Logger.getLogger(CLASS_NAME);
 
+    public DoNothingTransformer()
+    {
+    }
+
     public DoNothingTransformer(Properties properties)
     {
     }
