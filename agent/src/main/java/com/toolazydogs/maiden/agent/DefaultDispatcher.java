@@ -29,7 +29,7 @@ import com.toolazydogs.maiden.agent.transformers.PrintClassNameTransformer;
 /**
  *
  */
-class DefaultDispatcher implements Dispatcher
+final class DefaultDispatcher implements Dispatcher
 {
     private final static String CLASS_NAME = DefaultDispatcher.class.getName();
     private final static Logger LOGGER = Logger.getLogger(CLASS_NAME);

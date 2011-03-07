@@ -24,7 +24,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.toolazydogs.maiden.agent.api.Dispatcher;
-import com.toolazydogs.maiden.agent.transformers.IronTransformer;
 
 
 /**
