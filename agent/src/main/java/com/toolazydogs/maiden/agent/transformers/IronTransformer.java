@@ -29,7 +29,7 @@ import com.toolazydogs.maiden.agent.api.Dispatcher;
 /**
  * A class transformer for the iron maiden agent.
  */
-public class IronTransformer implements ClassFileTransformer, Opcodes
+public final class IronTransformer implements ClassFileTransformer, Opcodes
 {
     private final static String CLASS_NAME = IronTransformer.class.getName();
     private final static Logger LOGGER = Logger.getLogger(CLASS_NAME);
