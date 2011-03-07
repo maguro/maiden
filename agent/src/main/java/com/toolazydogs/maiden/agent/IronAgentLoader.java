@@ -29,7 +29,7 @@ import com.sun.tools.attach.VirtualMachine;
  * <p/>
  * Note: This loader relies on Sun's JVM class {@link com.sun.tools.attach.VirtualMachine}.
  */
-public class IronAgentLoader
+final public class IronAgentLoader
 {
     private final static String CLASS_NAME = IronAgentLoader.class.getName();
     private final static Logger LOGGER = Logger.getLogger(CLASS_NAME);

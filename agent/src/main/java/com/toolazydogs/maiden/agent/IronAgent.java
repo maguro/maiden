@@ -30,7 +30,7 @@ import com.toolazydogs.maiden.agent.transformers.IronTransformer;
 /**
  * An agent that registers the Iron Maiden's class transformer.
  */
-public class IronAgent
+final public class IronAgent
 {
     public final static String DISPATCHER_CLASS = "dispatcher";
     private final static String CLASS_NAME = IronAgent.class.getName();
