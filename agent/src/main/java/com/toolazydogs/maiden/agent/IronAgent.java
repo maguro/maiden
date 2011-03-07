@@ -78,21 +78,22 @@ public class IronAgent
     {
         LOGGER.entering(CLASS_NAME, "sharedmain", new Object[]{agentArgs, instrumentation});
 
-        if (agentArgs == null) agentArgs = "";
-
         String dn = DefaultDispatcher.class.getName();
         Properties properties = new Properties();
-        for (String arg : agentArgs.split(","))
+        if (agentArgs != null)
         {
-            String[] keyValue = arg.split("=");
-            if (keyValue.length == 2)
+            for (String arg : agentArgs.split(","))
             {
-                if (DISPATCHER_CLASS.equalsIgnoreCase(keyValue[0])) dn = keyValue[1];
-                else properties.put(keyValue[0], keyValue[1]);
-            }
-            else
-            {
-                LOGGER.warning("Argument not valid format " + arg);
+                String[] keyValue = arg.split("=");
+                if (keyValue.length == 2)
+                {
+                    if (DISPATCHER_CLASS.equalsIgnoreCase(keyValue[0])) dn = keyValue[1];
+                    else properties.put(keyValue[0], keyValue[1]);
+                }
+                else
+                {
+                    LOGGER.warning("Argument not valid format " + arg);
+                }
             }
         }
 
