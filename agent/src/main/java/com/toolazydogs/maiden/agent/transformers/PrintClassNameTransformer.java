@@ -44,14 +44,14 @@ public class PrintClassNameTransformer implements ClassFileTransformer
     {
         LOGGER.entering(CLASS_NAME, "transform", new Object[]{loader, className, classBeingRedefined, protectionDomain, classfileBuffer});
 
-        if (className.startsWith("com/toolazydogs/maiden")) return classfileBuffer;
-
         ClassReader reader = new ClassReader(classfileBuffer);
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
         reader.accept(new IronClassVisitor(className, writer), ClassReader.EXPAND_FRAMES);
 
-        LOGGER.exiting(CLASS_NAME, "transform", classfileBuffer);
+        byte[] result = writer.toByteArray();
 
-        return writer.toByteArray();
+        LOGGER.exiting(CLASS_NAME, "transform", result);
+
+        return result;
     }
 }

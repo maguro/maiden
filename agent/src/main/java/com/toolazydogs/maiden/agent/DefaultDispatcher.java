@@ -22,6 +22,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import com.toolazydogs.maiden.agent.api.Dispatcher;
+import com.toolazydogs.maiden.agent.transformers.DoNothingTransformer;
 import com.toolazydogs.maiden.agent.transformers.PrintClassNameTransformer;
 
 
@@ -32,6 +33,7 @@ class DefaultDispatcher implements Dispatcher
 {
     private final static String CLASS_NAME = DefaultDispatcher.class.getName();
     private final static Logger LOGGER = Logger.getLogger(CLASS_NAME);
+    private final static ClassFileTransformer DO_NOTHING = new DoNothingTransformer();
     private final Properties properties;
 
     public DefaultDispatcher(Properties properties)
@@ -43,6 +45,8 @@ class DefaultDispatcher implements Dispatcher
     public ClassFileTransformer lookup(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain)
     {
         LOGGER.entering(CLASS_NAME, "lookup", new Object[]{loader, className, classBeingRedefined, protectionDomain});
+
+        if (className.startsWith("com/toolazydogs/maiden")) return DO_NOTHING;
 
         ClassFileTransformer transformer = new PrintClassNameTransformer(properties);
 
