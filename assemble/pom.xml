@@ -9,38 +9,44 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>assemble</artifactId>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
     <name>Iron Maiden :: Assemble</name>
     <description>Iron Maiden Assembly</description>
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>attached</goal>
-                        </goals>
-                        <phase>package</phase>
-                        <configuration>
-                            <appendAssemblyId>true</appendAssemblyId>
-                            <descriptors>
-                                <descriptor>src/assemble/agent.xml</descriptor>
-                            </descriptors>
-                            <archive>
-                                <manifestEntries>
-                                    <Premain-Class>com.toolazydogs.maiden.agent.IronAgent</Premain-Class>
-                                    <Agent-Class>com.toolazydogs.maiden.agent.IronAgent</Agent-Class>
-                                    <Can-Redefine-Classes>true</Can-Redefine-Classes>
-                                    <Can-Retransform-Classes>true</Can-Retransform-Classes>
-                                </manifestEntries>
-                            </archive>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>1.4</version>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>shade</goal>
+                </goals>
+                <configuration>
+                  <finalName>assemble-${pom.version}</finalName>
+                  <relocations>
+                    <relocation>
+                      <pattern>org.objectweb.asm</pattern>
+                      <shadedPattern>com.toolazydogs.maiden.org.objectweb.asm</shadedPattern>
+                    </relocation>
+                  </relocations>
+                  <transformers>
+                    <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                      <manifestEntries>
+                        <Premain-Class>com.toolazydogs.maiden.agent.IronAgent</Premain-Class>
+                        <Agent-Class>com.toolazydogs.maiden.agent.IronAgent</Agent-Class>
+                        <Can-Redefine-Classes>true</Can-Redefine-Classes>
+                        <Can-Retransform-Classes>true</Can-Retransform-Classes>
+                      </manifestEntries>
+                    </transformer>
+                  </transformers>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
         </plugins>
     </build>
 
@@ -49,11 +55,6 @@
         <dependency>
             <groupId>asm</groupId>
             <artifactId>asm</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.toolazydogs.maiden</groupId>
-            <artifactId>agent</artifactId>
         </dependency>
 
         <dependency>
