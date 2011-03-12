@@ -35,7 +35,7 @@ public class DoNothingTransformer implements ClassFileTransformer
     {
     }
 
-    public DoNothingTransformer(Properties properties)
+    public DoNothingTransformer(Properties ignored)
     {
     }
 
@@ -46,8 +46,8 @@ public class DoNothingTransformer implements ClassFileTransformer
     {
         LOGGER.entering(CLASS_NAME, "transform", new Object[]{loader, className, classBeingRedefined, protectionDomain, classfileBuffer});
 
-        LOGGER.exiting(CLASS_NAME, "transform", classfileBuffer);
+        LOGGER.exiting(CLASS_NAME, "transform", null);
 
-        return classfileBuffer;
+        return null;
     }
 }
