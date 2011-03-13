@@ -32,7 +32,7 @@ public class DoNothingTransformerTest
     {
         byte[] mock = new byte[1];
 
-        assertSame(mock, new DoNothingTransformer().transform(null, null, null, null, mock));
-        assertSame(mock, new DoNothingTransformer(null).transform(null, null, null, null, mock));
+        assertSame(null, new DoNothingTransformer().transform(null, null, null, null, mock));
+        assertSame(null, new DoNothingTransformer(null).transform(null, null, null, null, mock));
     }
 }
