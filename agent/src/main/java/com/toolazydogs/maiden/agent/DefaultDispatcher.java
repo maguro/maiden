@@ -47,6 +47,7 @@ final class DefaultDispatcher implements Dispatcher
         LOGGER.entering(CLASS_NAME, "lookup", new Object[]{loader, className, classBeingRedefined, protectionDomain});
 
         if (className.startsWith("com/toolazydogs/maiden")) return DO_NOTHING;
+        if (className.startsWith("com/google/inject/internal")) return DO_NOTHING;
 
         ClassFileTransformer transformer = new PrintClassNameTransformer(properties);
 
