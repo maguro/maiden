@@ -30,7 +30,6 @@ public class RuntimeTest
     @Test
     public void test() throws Exception
     {
-        IronMaiden.announceLineNumber(4);
         IronAgentLoader.loadAgent("target/agent.jar", "test,args,in,list");
     }
 }

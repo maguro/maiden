@@ -23,16 +23,13 @@ import org.objectweb.asm.Attribute;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
-
-import com.toolazydogs.maiden.agent.asm.delay.LineAnnouncerMethodVisitor;
-import com.toolazydogs.maiden.agent.asm.delay.MethodAnnouncerMethodVisitor;
-import com.toolazydogs.maiden.agent.asm.delay.MethodVisitorAdaptor;
+import org.objectweb.asm.Opcodes;
 
 
 /**
  * An ASM class visitor.
  */
-public class IronClassVisitor implements ClassVisitor
+public class IronClassVisitor implements ClassVisitor, Opcodes
 {
     private final static String CLASS_NAME = IronClassVisitor.class.getName();
     private final static Logger LOGGER = Logger.getLogger(CLASS_NAME);
@@ -64,12 +61,36 @@ public class IronClassVisitor implements ClassVisitor
 
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions)
     {
-        return new IronMethodVisitor(
-                new LineAnnouncerMethodVisitor(
-                        new MethodAnnouncerMethodVisitor(clazz, name, desc,
-                                                         new MethodVisitorAdaptor(
-                                                                 delegate.visitMethod(access, name, desc, signature, exceptions)))));
+        LOGGER.entering(CLASS_NAME, "visitMethod", new Object[]{access, name, desc, signature, exceptions});
+
+        MethodVisitor mv = delegate.visitMethod(access, name, desc, signature, exceptions);
+        mv = new PushPopMethodVisitor(mv, clazz, name, desc);
+
+        if ((access & ACC_SYNCHRONIZED) != 0)
+        {
+            LOGGER.finest("Method is synchronized");
+
+            if ((access & ACC_STATIC) != 0)
+            {
+                LOGGER.finest("Method is not static");
+                mv = new SynchronizedStaticMethodVisitor(mv, clazz);
+            }
+            else
+            {
+                LOGGER.finest("Method is static");
+                mv = new SynchronizedMethodMethodVisitor(mv);
+            }
+        }
+
+        MethodVisitor result = new MonitorMethodVisitor(mv);
+
+        LOGGER.exiting(CLASS_NAME, "visitMethod", result);
+
+        return result;
     }
 
-    public void visitEnd() { delegate.visitEnd(); }
+    public void visitEnd()
+    {
+        delegate.visitEnd();
+    }
 }

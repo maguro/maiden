@@ -27,7 +27,8 @@ import com.toolazydogs.maiden.agent.api.Dispatcher;
 
 
 /**
- * A class transformer for the iron maiden agent.
+ * The root class transformer for the iron maiden agent.  This class is a
+ * simple wrapper to a dispatcher.
  */
 public final class IronTransformer implements ClassFileTransformer, Opcodes
 {

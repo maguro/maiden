@@ -28,19 +28,4 @@ public class IronObject extends Base
 {
     private final static String CLASS_NAME = IronObject.class.getName();
     private final static Logger LOGGER = Logger.getLogger(CLASS_NAME);
-    private final Map<String, Object> fields = new HashMap<String, Object>();
-
-    public void setField(String name, Object value)
-    {
-        assert name != null;
-
-        fields.put(name, value);
-    }
-
-    public Object getField(String name)
-    {
-        assert name != null;
-
-        return fields.get(name);
-    }
 }

@@ -16,8 +16,11 @@
  */
 package com.toolazydogs.maiden;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
+
+import com.toolazydogs.maiden.api.IronContext;
+import com.toolazydogs.maiden.api.IronListener;
 
 
 /**
@@ -25,51 +28,277 @@ import java.util.Map;
  */
 public class IronMaiden
 {
-    private final static Object LOCK = new Object();
-    private final static ThreadLocal<String> CLASS_NAMES = new ThreadLocal<String>();
-    private final static ThreadLocal<String> METHOD_NAMES = new ThreadLocal<String>();
-    private final static ThreadLocal<String> METHOD_DESCS = new ThreadLocal<String>();
-    private final static ThreadLocal<Integer> LINE_NUMBERS = new ThreadLocal<Integer>();
-    private final static Map<Object, Map<String, Object>> FIELDS = new HashMap<Object, Map<String, Object>>();
-
-
-    public static void announceMethod(String classname, String name, String desc)
+    private static Set<IronListener> LISTENERS = new CopyOnWriteArraySet<IronListener>();
+    private static ThreadLocal<Boolean> INSIDE = new ThreadLocal<Boolean>()
     {
-        CLASS_NAMES.set(classname);
-        METHOD_NAMES.set(name);
-        METHOD_DESCS.set(desc);
-    }
-
-    public static void announceLineNumber(int lineNumber)
-    {
-        LINE_NUMBERS.set(lineNumber);
-    }
-
-    public static void lockObject(Object object)
-    {
-    }
-
-    public static void unlockObject(Object object)
-    {
-    }
-
-    public static void putField(Object object, String name, Object value)
-    {
-        synchronized (LOCK)
+        @Override
+        protected Boolean initialValue()
         {
-            Map<String, Object> fields = FIELDS.get(object);
-            if (fields == null) FIELDS.put(object, fields = new HashMap<String, Object>());
-            fields.put(name, value);
+            return Boolean.FALSE;
+        }
+    };
+
+    /**
+     * Allocate a context that can be used to set the listener
+     *
+     * @return an instance of an {@link IronContext}
+     */
+    public static IronContext allocateContext()
+    {
+        return new IronContext()
+        {
+            public boolean addListener(IronListener listener)
+            {
+                if (listener == null) throw new IllegalArgumentException("Listener cannot be null");
+
+                return LISTENERS.add(listener);
+            }
+
+            public boolean removeListener(IronListener listener)
+            {
+                return listener != null && LISTENERS.remove(listener);
+
+            }
+        };
+    }
+
+    public static void push(String classname, String name, String desc)
+    {
+        if (INSIDE.get()) return;
+        else INSIDE.set(true);
+
+        try
+        {
+            for (IronListener listener : LISTENERS) listener.push(classname, name, desc);
+        }
+        finally
+        {
+            INSIDE.set(false);
         }
     }
 
-    public static Object getField(Object object, String name)
+    public static void pop(int line)
     {
-        synchronized (LOCK)
+        if (INSIDE.get()) return;
+        else INSIDE.set(true);
+
+        try
         {
-            Map<String, Object> fields = FIELDS.get(object);
-            if (fields == null) return null;
-            else return fields.get(name);
+            for (IronListener listener : LISTENERS) listener.pop(line);
+        }
+        finally
+        {
+            INSIDE.set(false);
+        }
+    }
+
+    public static void lockObject(int line, Object object)
+    {
+        if (INSIDE.get()) return;
+        else INSIDE.set(true);
+
+        try
+        {
+            for (IronListener listener : LISTENERS) listener.lockObject(line, object);
+        }
+        finally
+        {
+            INSIDE.set(false);
+        }
+    }
+
+    public static void unlockObject(int line, Object object)
+    {
+        if (INSIDE.get()) return;
+        else INSIDE.set(true);
+
+        try
+        {
+            for (IronListener listener : LISTENERS) listener.unlockObject(line, object);
+        }
+        finally
+        {
+            INSIDE.set(false);
+        }
+    }
+
+    public static void readVolatile(int line, Object object, String field)
+    {
+        if (INSIDE.get()) return;
+        else INSIDE.set(true);
+
+        try
+        {
+            for (IronListener listener : LISTENERS) listener.readVolatile(line, object, field);
+        }
+        finally
+        {
+            INSIDE.set(false);
+        }
+    }
+
+    public static void writeVolatile(int line, Object object, String field)
+    {
+        if (INSIDE.get()) return;
+        else INSIDE.set(true);
+
+        try
+        {
+            for (IronListener listener : LISTENERS) listener.writeVolatile(line, object, field);
+        }
+        finally
+        {
+            INSIDE.set(false);
+        }
+    }
+
+    public static void loadArray(int line, Object array, int index)
+    {
+        if (INSIDE.get()) return;
+        else INSIDE.set(true);
+
+        try
+        {
+            for (IronListener listener : LISTENERS) listener.loadArray(line, array, index);
+        }
+        finally
+        {
+            INSIDE.set(false);
+        }
+    }
+
+    public static void storeArray(int line, Object array, int index)
+    {
+        if (INSIDE.get()) return;
+        else INSIDE.set(true);
+
+        try
+        {
+            for (IronListener listener : LISTENERS) listener.storeArray(line, array, index);
+        }
+        finally
+        {
+            INSIDE.set(false);
+        }
+    }
+
+    public static void getField(int line, Object object, String name)
+    {
+        if (INSIDE.get()) return;
+        else INSIDE.set(true);
+
+        try
+        {
+            for (IronListener listener : LISTENERS) listener.getField(line, object, name);
+        }
+        finally
+        {
+            INSIDE.set(false);
+        }
+    }
+
+    public static void putField(int line, Object object, String name)
+    {
+        if (INSIDE.get()) return;
+        else INSIDE.set(true);
+
+        try
+        {
+            for (IronListener listener : LISTENERS) listener.putField(line, object, name);
+        }
+        finally
+        {
+            INSIDE.set(false);
+        }
+    }
+
+    public static void putStatic(int line, Class clazz, String name)
+    {
+        if (INSIDE.get()) return;
+        else INSIDE.set(true);
+
+        try
+        {
+            for (IronListener listener : LISTENERS) listener.putStatic(line, clazz, name);
+        }
+        finally
+        {
+            INSIDE.set(false);
+        }
+    }
+
+    public static void getStatic(int line, Class clazz, String name)
+    {
+        if (INSIDE.get()) return;
+        else INSIDE.set(true);
+
+        try
+        {
+            for (IronListener listener : LISTENERS) listener.getStatic(line, clazz, name);
+        }
+        finally
+        {
+            INSIDE.set(false);
+        }
+    }
+
+    public static void waitStart(int line, Object object)
+    {
+        if (INSIDE.get()) return;
+        else INSIDE.set(true);
+
+        try
+        {
+            for (IronListener listener : LISTENERS) listener.waitStart(line, object);
+        }
+        finally
+        {
+            INSIDE.set(false);
+        }
+    }
+
+    public static void waitStop(int line, Object object)
+    {
+        if (INSIDE.get()) return;
+        else INSIDE.set(true);
+
+        try
+        {
+            for (IronListener listener : LISTENERS) listener.waitStop(line, object);
+        }
+        finally
+        {
+            INSIDE.set(false);
+        }
+    }
+
+    public static void notifyFirstObject(int line, Object object)
+    {
+        if (INSIDE.get()) return;
+        else INSIDE.set(true);
+
+        try
+        {
+            for (IronListener listener : LISTENERS) listener.notifyFirstObject(line, object);
+        }
+        finally
+        {
+            INSIDE.set(false);
+        }
+    }
+
+    public static void notifyAllObjects(int line, Object object)
+    {
+        if (INSIDE.get()) return;
+        else INSIDE.set(true);
+
+        try
+        {
+            for (IronListener listener : LISTENERS) listener.notifyAllObjects(line, object);
+        }
+        finally
+        {
+            INSIDE.set(false);
         }
     }
 }

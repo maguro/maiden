@@ -34,7 +34,7 @@ public class Pojo
     private final static Logger LOGGER = Logger.getLogger(CLASS_NAME);
     private volatile String name;
     private Object[] array = new Object[10];
-    ThreadLocal<Map<String, Object>> local = new ThreadLocal<Map<String, Object>>()
+    private ThreadLocal<Map<String, Object>> local = new ThreadLocal<Map<String, Object>>()
     {
         @Override
         protected Map<String, Object> initialValue()
@@ -42,26 +42,70 @@ public class Pojo
             return new HashMap<String, Object>();
         }
     };
+    private static int hookCounter;
+    private static final String intern;
+    private volatile Integer vInteger;
+
+    static
+    {
+        hookCounter = 4;
+    }
+
+    static
+    {
+        hookCounter = 7;
+        intern = "IN".intern();
+
+    }
 
     public Pojo()
     {
-        IronMaiden.announceLineNumber(31);
     }
+
+    public static native void nativeMethod();
 
     public String getName()
     {
-        IronMaiden.announceLineNumber(54);
         return name;
     }
 
-    public void setName(String name)
+    public synchronized void setName(String name)
     {
         this.name = name;
     }
 
-    public void foo(Object[] array)
+    public static synchronized void bar(Object[] array)
     {
+        int i = 0;
+        for (int j = i; j < 100000; i++)
+        {
+            Object t = array[0];
+            array[1] = t;
+        }
+    }
+
+    synchronized private static int getNextHook()
+    {
+//        IronMaiden.push();
+//        try
+//        {
+            if (hookCounter == 1) return 17;
+            return ++hookCounter;
+//        }
+//        finally
+//        {
+//            IronMaiden.pop();
+//        }
+    }
+
+    public void foo(byte[] array) throws InterruptedException
+    {
+        LOGGER.wait();
+        vInteger = vint = 2;
         Pojo pojo = new Pojo();
+
+        int i = vint;
+        int j = vInteger;
 
         synchronized (LOGGER)
         {
@@ -71,16 +115,18 @@ public class Pojo
 
             int size = array.length;
             int hash = array.hashCode();
-            Object t = array[0];
+            byte t = array[0];
             array[1] = t;
 
-            local.get().put("ALAN", new Event(new Line("p", 3))
+            local.get().put("ALAN", new Event(new Line("c.a.t", "p", "()V", 3))
             {
             });
         }
         array[0] = 1;
 
         pojo.name = "BAR";
-        IronMaiden.putField(pojo, "name", "TEST");
+        IronMaiden.putField(1, pojo, "name");
     }
+
+    private volatile int vint;
 }

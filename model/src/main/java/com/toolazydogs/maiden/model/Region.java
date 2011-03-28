@@ -26,12 +26,50 @@ import java.util.logging.Logger;
 /**
  *
  */
-public class Epoch implements Map<String, Object>
+public class Region implements Map<String, Object>
 {
-    private final static String CLASS_NAME = Epoch.class.getName();
+    private final static String CLASS_NAME = Region.class.getName();
     private final static Logger LOGGER = Logger.getLogger(CLASS_NAME);
     private final Map<String, Object> map = new HashMap<String, Object>();
-    private volatile Epoch parent;
+    private volatile Region parent;
+    private volatile Line begin;
+    private volatile Line end;
+
+    public Region(Region parent, Line begin)
+    {
+        this.parent = parent;
+        this.begin = begin;
+    }
+
+    public Region getParent()
+    {
+        return parent;
+    }
+
+    public void setParent(Region parent)
+    {
+        this.parent = parent;
+    }
+
+    public Line getBegin()
+    {
+        return begin;
+    }
+
+    public void setBegin(Line begin)
+    {
+        this.begin = begin;
+    }
+
+    public Line getEnd()
+    {
+        return end;
+    }
+
+    public void setEnd(Line end)
+    {
+        this.end = end;
+    }
 
     public int size()
     {

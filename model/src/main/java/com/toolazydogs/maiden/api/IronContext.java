@@ -14,17 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.toolazydogs.maiden.agent.asm.delay;
-
-import org.objectweb.asm.MethodVisitor;
-
+package com.toolazydogs.maiden.api;
 
 /**
- * Implementations of this interface delay visiting of their delegates until
- * the method {@link #flush(org.objectweb.asm.MethodVisitor, boolean)} is
- * called.
+ *
  */
-public interface DelayedMethodVisitor
+public interface IronContext
 {
-    void flush(MethodVisitor methodVisitor, boolean mark);
+    boolean addListener(IronListener listener);
+
+    boolean removeListener(IronListener listener);
 }

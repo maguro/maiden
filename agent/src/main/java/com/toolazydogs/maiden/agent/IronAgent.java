@@ -16,6 +16,7 @@
  */
 package com.toolazydogs.maiden.agent;
 
+import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -23,6 +24,8 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.toolazydogs.maiden.InMemoryIronListener;
+import com.toolazydogs.maiden.IronMaiden;
 import com.toolazydogs.maiden.agent.api.Dispatcher;
 
 
@@ -96,6 +99,8 @@ final public class IronAgent
             }
         }
 
+        IronMaiden.allocateContext().addListener(new InMemoryIronListener());
+
         try
         {
             Class<Dispatcher> dc;
@@ -112,7 +117,9 @@ final public class IronAgent
             Constructor<Dispatcher> constructor = dc.getConstructor(Properties.class);
             Dispatcher dispatcher = constructor.newInstance(properties);
 
-            instrumentation.addTransformer(new IronTransformer(dispatcher));
+            ClassFileTransformer transformer = new IronTransformer(dispatcher);
+            instrumentation.addTransformer(transformer);
+            instrumentation.setNativeMethodPrefix(transformer, "maiden");
         }
         catch (ClassNotFoundException e)
         {

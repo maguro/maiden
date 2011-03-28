@@ -48,6 +48,7 @@ final class DefaultDispatcher implements Dispatcher
 
         if (className.startsWith("com/toolazydogs/maiden")) return DO_NOTHING;
         if (className.startsWith("com/google/inject/internal")) return DO_NOTHING;
+        if (className.startsWith("sun/tools/attach")) return DO_NOTHING;
 
         ClassFileTransformer transformer = new PrintClassNameTransformer(properties);
 
