@@ -73,7 +73,7 @@
 
             <dependency>
                 <groupId>asm</groupId>
-                <artifactId>asm-analysis</artifactId>
+                <artifactId>asm-commons</artifactId>
                 <version>${asmVersion}</version>
             </dependency>
 
