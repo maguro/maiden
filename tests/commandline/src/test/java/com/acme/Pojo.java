@@ -64,6 +64,10 @@ public class Pojo
 
     public static native void nativeMethod();
 
+    public void writeMessage( String message )
+    {
+    }
+
     public String getName()
     {
         return name;
@@ -86,15 +90,29 @@ public class Pojo
 
     synchronized private static int getNextHook()
     {
-//        IronMaiden.push();
+//        IronMaiden.push("", "", "");
 //        try
 //        {
+            try
+            {
+                bar(null);
+                if (vint == 1) return -1;
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();  //Todo change body of catch statement use File | Settings | File Templates.
+                return -2;
+            }
+            finally
+            {
+                vint = 4;
+            }
             if (hookCounter == 1) return 17;
             return ++hookCounter;
 //        }
 //        finally
 //        {
-//            IronMaiden.pop();
+//            IronMaiden.pop(1);
 //        }
     }
 
@@ -128,5 +146,5 @@ public class Pojo
         IronMaiden.putField(1, pojo, "name");
     }
 
-    private volatile int vint;
+    private static int vint;
 }

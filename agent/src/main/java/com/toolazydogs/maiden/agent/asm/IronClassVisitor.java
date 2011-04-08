@@ -24,6 +24,7 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.commons.AdviceAdapter;
 
 
 /**
@@ -64,7 +65,7 @@ public class IronClassVisitor implements ClassVisitor, Opcodes
         LOGGER.entering(CLASS_NAME, "visitMethod", new Object[]{access, name, desc, signature, exceptions});
 
         MethodVisitor mv = delegate.visitMethod(access, name, desc, signature, exceptions);
-        mv = new PushPopMethodVisitor(mv, clazz, name, desc);
+        mv = new PushPopMethodVisitor(mv, clazz, access,  name, desc, signature, exceptions);
 
         if ((access & ACC_SYNCHRONIZED) != 0)
         {
@@ -82,6 +83,7 @@ public class IronClassVisitor implements ClassVisitor, Opcodes
             }
         }
 
+        AdviceAdapter av;
         MethodVisitor result = new MonitorMethodVisitor(mv);
 
         LOGGER.exiting(CLASS_NAME, "visitMethod", result);

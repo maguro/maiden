@@ -42,8 +42,8 @@ public class SynchronizedMethodMethodVisitor extends DelegateMethodVisitor imple
     {
         LOGGER.entering(CLASS_NAME, "visitCode");
 
-        AsmUtils.pushInteger(getVisitor(), line);
-        getVisitor().visitIntInsn(ALOAD, 0);
+        AsmUtils.push(getVisitor(), line);
+        getVisitor().visitVarInsn(ALOAD, 0);
         getVisitor().visitMethodInsn(INVOKESTATIC, "com/toolazydogs/maiden/IronMaiden", "lockObject", "(ILjava/lang/Object;)V");
 
         getVisitor().visitCode();
@@ -65,8 +65,8 @@ public class SynchronizedMethodMethodVisitor extends DelegateMethodVisitor imple
             case ARETURN:
             case RETURN:
             case ATHROW:
-                AsmUtils.pushInteger(getVisitor(), line);
-                getVisitor().visitIntInsn(ALOAD, 0);
+                AsmUtils.push(getVisitor(), line);
+                getVisitor().visitVarInsn(ALOAD, 0);
                 getVisitor().visitMethodInsn(INVOKESTATIC, "com/toolazydogs/maiden/IronMaiden", "unlockObject", "(ILjava/lang/Object;)V");
                 break;
 
@@ -86,8 +86,8 @@ public class SynchronizedMethodMethodVisitor extends DelegateMethodVisitor imple
         switch (opcode)
         {
             case RET:
-                AsmUtils.pushInteger(getVisitor(), line);
-                getVisitor().visitIntInsn(ALOAD, 0);
+                AsmUtils.push(getVisitor(), line);
+                getVisitor().visitVarInsn(ALOAD, 0);
                 getVisitor().visitMethodInsn(INVOKESTATIC, "com/toolazydogs/maiden/IronMaiden", "unlockObject", "(ILjava/lang/Object;)V");
                 break;
 

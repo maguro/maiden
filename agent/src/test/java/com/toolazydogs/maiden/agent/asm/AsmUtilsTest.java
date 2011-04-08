@@ -34,12 +34,12 @@ public class AsmUtilsTest
     {
         MethodVisitor methodVisitor = mock(MethodVisitor.class);
 
-        AsmUtils.pushInteger(methodVisitor, 59);
+        AsmUtils.push(methodVisitor, 59);
 
         verify(methodVisitor).visitIntInsn(Opcodes.BIPUSH, 59);
         verify(methodVisitor, never()).visitIntInsn(Opcodes.SIPUSH, 59);
 
-        AsmUtils.pushInteger(methodVisitor, 32760);
+        AsmUtils.push(methodVisitor, 32760);
 
         verify(methodVisitor, never()).visitIntInsn(Opcodes.BIPUSH, 32760);
         verify(methodVisitor).visitIntInsn(Opcodes.SIPUSH, 32760);

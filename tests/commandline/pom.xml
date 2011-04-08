@@ -56,15 +56,15 @@
 
     <dependencies>
 
-        <dependency>
-            <groupId>asm</groupId>
-            <artifactId>asm</artifactId>
-            <scope>test</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>asm</groupId>-->
+            <!--<artifactId>asm</artifactId>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>asm</groupId>
-            <artifactId>asm-util</artifactId>
+            <artifactId>asm-debug-all</artifactId>
             <scope>test</scope>
         </dependency>
 

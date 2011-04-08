@@ -19,6 +19,7 @@ package com.toolazydogs.maiden.agent.asm;
 import java.util.logging.Logger;
 
 import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodAdapter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
@@ -26,7 +27,7 @@ import org.objectweb.asm.Opcodes;
 /**
  *
  */
-public class MonitorMethodVisitor extends DelegateMethodVisitor implements Opcodes
+public class MonitorMethodVisitor extends MethodAdapter implements Opcodes
 {
     private final static String CLASS_NAME = MonitorMethodVisitor.class.getName();
     private final static Logger LOGGER = Logger.getLogger(CLASS_NAME);
@@ -42,23 +43,26 @@ public class MonitorMethodVisitor extends DelegateMethodVisitor implements Opcod
     {
         LOGGER.entering(CLASS_NAME, "visitInsn", opcode);
 
-        getVisitor().visitInsn(opcode);
-
         switch (opcode)
         {
             case MONITORENTER:
-                AsmUtils.pushInteger(getVisitor(), line);
-                getVisitor().visitIntInsn(ALOAD, 0);
-                getVisitor().visitMethodInsn(INVOKESTATIC, "com/toolazydogs/maiden/IronMaiden", "lockObject", "(ILjava/lang/Object;)V");
+                mv.visitInsn(opcode);
+
+                AsmUtils.push(mv, line);
+                mv.visitVarInsn(ALOAD, 0);
+                mv.visitMethodInsn(INVOKESTATIC, "com/toolazydogs/maiden/IronMaiden", "lockObject", "(ILjava/lang/Object;)V");
                 break;
 
             case MONITOREXIT:
-                AsmUtils.pushInteger(getVisitor(), line);
-                getVisitor().visitIntInsn(ALOAD, 0);
-                getVisitor().visitMethodInsn(INVOKESTATIC, "com/toolazydogs/maiden/IronMaiden", "unlockObject", "(ILjava/lang/Object;)V");
+                AsmUtils.push(mv, line);
+                mv.visitVarInsn(ALOAD, 0);
+                mv.visitMethodInsn(INVOKESTATIC, "com/toolazydogs/maiden/IronMaiden", "unlockObject", "(ILjava/lang/Object;)V");
+
+                mv.visitInsn(opcode);
                 break;
 
             default:
+                mv.visitInsn(opcode);
         }
 
         LOGGER.exiting(CLASS_NAME, "visitInsn");
@@ -69,6 +73,6 @@ public class MonitorMethodVisitor extends DelegateMethodVisitor implements Opcod
     {
         this.line = line;
 
-        getVisitor().visitLineNumber(line, start);
+        mv.visitLineNumber(line, start);
     }
 }

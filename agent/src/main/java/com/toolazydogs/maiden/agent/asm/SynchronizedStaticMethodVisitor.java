@@ -49,7 +49,7 @@ public class SynchronizedStaticMethodVisitor extends DelegateMethodVisitor imple
 
         getVisitor().visitCode();
 
-        AsmUtils.pushInteger(getVisitor(), line);
+        AsmUtils.push(getVisitor(), line);
         getVisitor().visitLdcInsn(Type.getType(className));
         getVisitor().visitMethodInsn(INVOKESTATIC, "com/toolazydogs/maiden/IronMaiden", "lockObject", "(ILjava/lang/Object;)V");
 
@@ -70,7 +70,7 @@ public class SynchronizedStaticMethodVisitor extends DelegateMethodVisitor imple
             case ARETURN:
             case RETURN:
             case ATHROW:
-                AsmUtils.pushInteger(getVisitor(), line);
+                AsmUtils.push(getVisitor(), line);
                 getVisitor().visitLdcInsn(Type.getType(className));
                 getVisitor().visitMethodInsn(INVOKESTATIC, "com/toolazydogs/maiden/IronMaiden", "unlockObject", "(ILjava/lang/Object;)V");
                 break;
@@ -91,7 +91,7 @@ public class SynchronizedStaticMethodVisitor extends DelegateMethodVisitor imple
         switch (opcode)
         {
             case RET:
-                AsmUtils.pushInteger(getVisitor(), line);
+                AsmUtils.push(getVisitor(), line);
                 getVisitor().visitLdcInsn(Type.getType(className));
                 getVisitor().visitMethodInsn(INVOKESTATIC, "com/toolazydogs/maiden/IronMaiden", "unlockObject", "(ILjava/lang/Object;)V");
                 break;

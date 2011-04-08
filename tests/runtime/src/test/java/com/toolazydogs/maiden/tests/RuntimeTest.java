@@ -30,6 +30,6 @@ public class RuntimeTest
     @Test
     public void test() throws Exception
     {
-        IronAgentLoader.loadAgent("target/agent.jar", "test,args,in,list");
+//        IronAgentLoader.loadAgent("target/agent.jar", "test,args,in,list");
     }
 }

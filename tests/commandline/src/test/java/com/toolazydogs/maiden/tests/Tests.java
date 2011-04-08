@@ -24,6 +24,7 @@ import java.io.PrintWriter;
 import com.acme.Pojo;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.util.CheckClassAdapter;
 import org.objectweb.asm.util.TraceClassVisitor;
 import org.testng.annotations.Test;
 
@@ -66,6 +67,11 @@ public class Tests
 
         ClassReader reader = new ClassReader(out.toByteArray());
         reader.accept(new IronClassVisitor(clazz, writer), ClassReader.EXPAND_FRAMES);
+
+        reader = new ClassReader(writer.toByteArray());
+
+        writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
+        reader.accept(new CheckClassAdapter(writer), ClassReader.EXPAND_FRAMES);
 
         reader = new ClassReader(writer.toByteArray());
         reader.accept(new TraceClassVisitor(null, new PrintWriter(System.out)), ClassReader.EXPAND_FRAMES);

@@ -18,6 +18,7 @@ package com.toolazydogs.maiden.agent.asm;
 
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 
 
 /**
@@ -25,9 +26,40 @@ import org.objectweb.asm.Opcodes;
  */
 public class AsmUtils
 {
-    public static void pushInteger(MethodVisitor methodVisitor, int value)
+    /**
+     * Generates the instruction to push the given value on the stack.
+     *
+     * @param methodVisitor the visitor to which to send the instruction
+     * @param value the value to be pushed on the stack.
+     */
+    public static void push(MethodVisitor methodVisitor, boolean value)
     {
-        if (Byte.MIN_VALUE <= value && value <= Byte.MAX_VALUE) methodVisitor.visitIntInsn(Opcodes.BIPUSH, value);
-        else if (Short.MIN_VALUE <= value && value <= Short.MAX_VALUE) methodVisitor.visitIntInsn(Opcodes.SIPUSH, value);
+        push(methodVisitor, value ? 1 : 0);
+    }
+
+    /**
+     * Generates the instruction to push the given value on the stack.
+     *
+     * @param methodVisitor the visitor to which to send the instruction
+     * @param value the value to be pushed on the stack.
+     */
+    public static void push(MethodVisitor methodVisitor, int value)
+    {
+        if (value >= -1 && value <= 5)
+        {
+            methodVisitor.visitInsn(Opcodes.ICONST_0 + value);
+        }
+        else if (value >= Byte.MIN_VALUE && value <= Byte.MAX_VALUE)
+        {
+            methodVisitor.visitIntInsn(Opcodes.BIPUSH, value);
+        }
+        else if (value >= Short.MIN_VALUE && value <= Short.MAX_VALUE)
+        {
+            methodVisitor.visitIntInsn(Opcodes.SIPUSH, value);
+        }
+        else
+        {
+            methodVisitor.visitLdcInsn(value);
+        }
     }
 }

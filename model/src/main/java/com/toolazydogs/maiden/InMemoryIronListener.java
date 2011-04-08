@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 
 import com.toolazydogs.maiden.api.IronListener;
 import com.toolazydogs.maiden.model.Line;
+import com.toolazydogs.maiden.model.MethodDesc;
 import com.toolazydogs.maiden.model.Region;
 
 
@@ -42,21 +43,51 @@ public class InMemoryIronListener implements IronListener
             return new Stack<Object>();
         }
     };
-    private final ThreadLocal<Stack<Object>> CALL_STACK = new ThreadLocal<Stack<Object>>()
+    private final ThreadLocal<Stack<MethodDesc>> CALL_STACK = new ThreadLocal<Stack<MethodDesc>>()
     {
         @Override
-        protected Stack<Object> initialValue()
+        protected Stack<MethodDesc> initialValue()
         {
-            return new Stack<Object>();
+            return new Stack<MethodDesc>();
         }
     };
 
     public void push(String classname, String name, String desc)
     {
+//        indent();
+//        System.err.println("PUSH: " + classname + "." + name + " " + desc);
+        CALL_STACK.get().push(new MethodDesc(classname, name, desc));
     }
 
     public void pop(int line)
     {
+        if (CALL_STACK.get().isEmpty())
+        {
+            System.err.print(System.identityHashCode(Thread.currentThread()));
+            System.err.println("***** OI ");
+            Thread[] threads = new Thread[Thread.activeCount()];
+            Thread.enumerate(threads);
+            for (Thread t : threads)
+            {
+                System.err.println(t.getId() + " " + t.getName());
+            }
+            System.exit(0);
+        }
+        if (line == -1)
+        {
+//            System.err.print(System.identityHashCode(Thread.currentThread()));
+//            System.err.println("***** THROW ");
+        }
+        MethodDesc methodDesc = CALL_STACK.get().pop();
+//        indent();
+//        System.err.println("POP:  " + methodDesc.getClassname() + "." + methodDesc.getName() + " " + methodDesc.getDesc() + "#" + line);
+    }
+
+    public void indent()
+    {
+        System.err.print(System.identityHashCode(Thread.currentThread()));
+        int size = CALL_STACK.get().size();
+        for (int i = 0; i < size; i++) System.err.print(" ");
     }
 
     public void lockObject(int line, Object object)

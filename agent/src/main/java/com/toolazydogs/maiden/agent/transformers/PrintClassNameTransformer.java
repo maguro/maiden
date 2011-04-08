@@ -16,6 +16,13 @@
  */
 package com.toolazydogs.maiden.agent.transformers;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
@@ -49,6 +56,28 @@ public class PrintClassNameTransformer implements ClassFileTransformer
         reader.accept(new IronClassVisitor(className, writer), ClassReader.EXPAND_FRAMES);
 
         byte[] result = writer.toByteArray();
+
+        if ("org/apache/maven/surefire/report/XMLReporter".equals(className))
+        {
+            try
+            {
+                File file = new File("/Users/acabrera/XMLReporter.class");
+                OutputStream out = new FileOutputStream(file);
+                InputStream in = new ByteArrayInputStream(result);
+                byte[] buffer = new byte[1024];
+                int len = 0;
+                while ((len = in.read(buffer)) != -1) out.write(buffer, 0, len);
+                out.close();
+            }
+            catch (FileNotFoundException e)
+            {
+                e.printStackTrace();  //Todo change body of catch statement use File | Settings | File Templates.
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();  //Todo change body of catch statement use File | Settings | File Templates.
+            }
+        }
 
         LOGGER.exiting(CLASS_NAME, "transform", result);
 

@@ -84,6 +84,12 @@
             </dependency>
 
             <dependency>
+                <groupId>asm</groupId>
+                <artifactId>asm-debug-all</artifactId>
+                <version>${asmVersion}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>com.toolazydogs.maiden</groupId>
                 <artifactId>agent</artifactId>
                 <version>${pom.version}</version>
