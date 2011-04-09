@@ -73,6 +73,12 @@
 
             <dependency>
                 <groupId>asm</groupId>
+                <artifactId>asm-analysis</artifactId>
+                <version>${asmVersion}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>asm</groupId>
                 <artifactId>asm-commons</artifactId>
                 <version>${asmVersion}</version>
             </dependency>
@@ -80,12 +86,6 @@
             <dependency>
                 <groupId>asm</groupId>
                 <artifactId>asm-util</artifactId>
-                <version>${asmVersion}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>asm</groupId>
-                <artifactId>asm-debug-all</artifactId>
                 <version>${asmVersion}</version>
             </dependency>
 

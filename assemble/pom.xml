@@ -55,7 +55,7 @@
 
         <dependency>
             <groupId>asm</groupId>
-            <artifactId>asm-debug-all</artifactId>
+            <artifactId>asm</artifactId>
         </dependency>
 
         <dependency>
