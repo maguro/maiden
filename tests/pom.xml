@@ -16,7 +16,6 @@
 
     <modules>
         <module>commandline</module>
-        <module>runtime</module>
     </modules>
 
 </project>

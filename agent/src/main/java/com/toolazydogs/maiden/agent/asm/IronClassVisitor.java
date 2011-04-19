@@ -24,7 +24,7 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.commons.AdviceAdapter;
+import org.objectweb.asm.Type;
 
 
 /**
@@ -60,31 +60,84 @@ public class IronClassVisitor implements ClassVisitor, Opcodes
 
     public FieldVisitor visitField(int access, String name, String desc, String signature, Object value) { return delegate.visitField(access, name, desc, signature, value); }
 
-    public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions)
+    public MethodVisitor visitMethod(int access, final String name, final String desc, String signature, String[] exceptions)
     {
         LOGGER.entering(CLASS_NAME, "visitMethod", new Object[]{access, name, desc, signature, exceptions});
 
         MethodVisitor mv = delegate.visitMethod(access, name, desc, signature, exceptions);
-        mv = new PushPopMethodVisitor(mv, clazz, access,  name, desc, signature, exceptions);
+        BeginEndMethodVisitor vmv = new BeginEndMethodVisitor(mv, clazz, access,  name, desc, signature, exceptions);
+
+        vmv.getListeners().add(new BeginEndMethodListener()
+        {
+            @Override
+            public void begin(MethodVisitor visitor)
+            {
+                visitor.visitLdcInsn(clazz);
+                visitor.visitLdcInsn(name);
+                visitor.visitLdcInsn(desc);
+                visitor.visitMethodInsn(INVOKESTATIC, "com/toolazydogs/maiden/IronMaiden", "push", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
+            }
+
+            @Override
+            public void end(MethodVisitor visitor)
+            {
+                AsmUtils.push(visitor, line);
+                visitor.visitMethodInsn(INVOKESTATIC, "com/toolazydogs/maiden/IronMaiden", "pop", "(I)V");
+            }
+        });
 
         if ((access & ACC_SYNCHRONIZED) != 0)
         {
             LOGGER.finest("Method is synchronized");
 
+            final Type classType = Type.getType("L" + clazz + ";.class");
             if ((access & ACC_STATIC) != 0)
             {
-                LOGGER.finest("Method is not static");
-                mv = new SynchronizedStaticMethodVisitor(mv, clazz);
+                LOGGER.finest("Method is static");
+                vmv.getListeners().add(new BeginEndMethodListener()
+                {
+                    @Override
+                    public void begin(MethodVisitor visitor)
+                    {
+                        AsmUtils.push(visitor, line);
+                        visitor.visitLdcInsn(classType);
+                        visitor.visitMethodInsn(INVOKESTATIC, "com/toolazydogs/maiden/IronMaiden", "lockObject", "(ILjava/lang/Object;)V");
+                    }
+
+                    @Override
+                    public void end(MethodVisitor visitor)
+                    {
+                        AsmUtils.push(visitor, line);
+                        visitor.visitLdcInsn(classType);
+                        visitor.visitMethodInsn(INVOKESTATIC, "com/toolazydogs/maiden/IronMaiden", "unlockObject", "(ILjava/lang/Object;)V");
+                    }
+                });
             }
             else
             {
-                LOGGER.finest("Method is static");
-                mv = new SynchronizedMethodMethodVisitor(mv);
+                LOGGER.finest("Method is not static");
+                vmv.getListeners().add(new BeginEndMethodListener()
+                {
+                    @Override
+                    public void begin(MethodVisitor visitor)
+                    {
+                        AsmUtils.push(visitor, line);
+                        visitor.visitVarInsn(ALOAD, 0);
+                        visitor.visitMethodInsn(INVOKESTATIC, "com/toolazydogs/maiden/IronMaiden", "lockObject", "(ILjava/lang/Object;)V");
+                    }
+
+                    @Override
+                    public void end(MethodVisitor visitor)
+                    {
+                        AsmUtils.push(visitor, line);
+                        visitor.visitVarInsn(ALOAD, 0);
+                        visitor.visitMethodInsn(INVOKESTATIC, "com/toolazydogs/maiden/IronMaiden", "unlockObject", "(ILjava/lang/Object;)V");
+                    }
+                });
             }
         }
 
-        AdviceAdapter av;
-        MethodVisitor result = new MonitorMethodVisitor(mv);
+        MethodVisitor result = new MonitorMethodVisitor(vmv);
 
         LOGGER.exiting(CLASS_NAME, "visitMethod", result);
 

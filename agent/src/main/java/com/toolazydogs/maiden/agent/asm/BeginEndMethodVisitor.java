@@ -16,6 +16,9 @@
  */
 package com.toolazydogs.maiden.agent.asm;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.objectweb.asm.AnnotationVisitor;
@@ -31,26 +34,24 @@ import org.objectweb.asm.tree.MethodNode;
 /**
  *
  */
-public class PushPopMethodVisitor implements MethodVisitor, Opcodes
+public class BeginEndMethodVisitor implements MethodVisitor, Opcodes
 {
     private final static int CLEARED = 0;
     private final static int NEED_START_LABEL = 1;
 
-    private final static String CLASS_NAME = PushPopMethodVisitor.class.getName();
+    private final static String CLASS_NAME = BeginEndMethodVisitor.class.getName();
     private final static Logger LOGGER = Logger.getLogger(CLASS_NAME);
+    private final List<BeginEndMethodListener> listeners = new ArrayList<BeginEndMethodListener>();
+    private transient List<BeginEndMethodListener> reversed = null;
     private final LocalVariablesSorter lvs;
     private final MethodNode methodNode;
     private final MethodVisitor visitor;
-    private final String clazz;
-    private final String name;
-    private final String desc;
     private int state = CLEARED;
-    private int line;
     private final Label l7 = new Label();
     private Label start;
     private boolean sawCode = false;
 
-    public PushPopMethodVisitor(MethodVisitor visitor, String clazz, int access, String name, String desc, String signature, String[] exceptions)
+    public BeginEndMethodVisitor(MethodVisitor visitor, String clazz, int access, String name, String desc, String signature, String[] exceptions)
     {
         assert visitor != null;
         assert clazz != null;
@@ -58,12 +59,25 @@ public class PushPopMethodVisitor implements MethodVisitor, Opcodes
         assert desc != null;
 
         this.visitor = visitor;
-        this.clazz = clazz;
-        this.name = name;
-        this.desc = desc;
 
         methodNode = new MethodNode(access, name, desc, signature, exceptions);
         lvs = new LocalVariablesSorter(access, desc, methodNode);
+    }
+
+    public List<BeginEndMethodListener> getListeners()
+    {
+        reversed = null;
+        return listeners;
+    }
+
+    protected List<BeginEndMethodListener> getReversed()
+    {
+        if (reversed == null)
+        {
+            reversed = new ArrayList<BeginEndMethodListener>(listeners);
+            Collections.reverse(reversed);
+        }
+        return reversed;
     }
 
     public AnnotationVisitor visitAnnotationDefault() { return lvs.visitAnnotationDefault();}
@@ -80,10 +94,7 @@ public class PushPopMethodVisitor implements MethodVisitor, Opcodes
 
         lvs.visitCode();
 
-        lvs.visitLdcInsn(clazz);
-        lvs.visitLdcInsn(name);
-        lvs.visitLdcInsn(desc);
-        lvs.visitMethodInsn(INVOKESTATIC, "com/toolazydogs/maiden/IronMaiden", "push", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
+        for (BeginEndMethodListener listener : listeners) listener.begin(lvs);
 
         state = NEED_START_LABEL;
 
@@ -92,8 +103,6 @@ public class PushPopMethodVisitor implements MethodVisitor, Opcodes
 
     public void visitFrame(int type, int nLocal, Object[] local, int nStack, Object[] stack)
     {
-//        flush();
-//        lvs.visitFrame(type, nLocal, local, nStack, stack);
     }
 
     public void visitInsn(int opcode)
@@ -117,8 +126,7 @@ public class PushPopMethodVisitor implements MethodVisitor, Opcodes
                     lvs.visitTryCatchBlock(start, end, l7, null);
                 }
 
-                AsmUtils.push(lvs, line);
-                lvs.visitMethodInsn(INVOKESTATIC, "com/toolazydogs/maiden/IronMaiden", "pop", "(I)V");
+                for (BeginEndMethodListener listener : getReversed()) listener.end(lvs);
 
                 start = null;
                 state = NEED_START_LABEL;
@@ -241,7 +249,7 @@ public class PushPopMethodVisitor implements MethodVisitor, Opcodes
     public void visitLineNumber(int line, Label start)
     {
         flush();
-        this.line = line;
+        for (BeginEndMethodListener listener : listeners) listener.line(line);
         lvs.visitLineNumber(line, start);
     }
 
@@ -259,8 +267,9 @@ public class PushPopMethodVisitor implements MethodVisitor, Opcodes
             lvs.visitLabel(l7);
             lvs.visitVarInsn(ASTORE, local);
             lvs.visitLabel(l13);
-            AsmUtils.push(lvs, -1);
-            lvs.visitMethodInsn(INVOKESTATIC, "com/toolazydogs/maiden/IronMaiden", "pop", "(I)V");
+
+            for (BeginEndMethodListener listener : getReversed()) listener.end(lvs);
+
             lvs.visitVarInsn(ALOAD, local);
             lvs.visitInsn(ATHROW);
         }

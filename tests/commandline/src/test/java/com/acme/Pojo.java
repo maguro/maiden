@@ -55,7 +55,6 @@ public class Pojo
     {
         hookCounter = 7;
         intern = "IN".intern();
-
     }
 
     public Pojo()

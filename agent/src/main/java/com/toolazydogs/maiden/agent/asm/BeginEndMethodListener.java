@@ -1,6 +1,6 @@
 /**
  *
- * Copyright 2010-2011 (C) The original author or authors
+ * Copyright 2011 (C) The original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.toolazydogs.maiden.tests;
+package com.toolazydogs.maiden.agent.asm;
 
-import org.testng.annotations.Test;
-
-import com.toolazydogs.maiden.IronMaiden;
-import com.toolazydogs.maiden.agent.IronAgentLoader;
+import org.objectweb.asm.MethodVisitor;
 
 
 /**
- * Test runtime loading of java agent
+ *
  */
-public class RuntimeTest
+public class BeginEndMethodListener
 {
-    @Test
-    public void test() throws Exception
+    protected int line;
+
+    public void begin(MethodVisitor visitor)
     {
-//        IronAgentLoader.loadAgent("target/agent.jar", "test,args,in,list");
+    }
+
+    public void line(int line)
+    {
+        this.line = line;
+    }
+
+    public void end(MethodVisitor visitor)
+    {
     }
 }
