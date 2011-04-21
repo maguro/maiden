@@ -32,12 +32,10 @@ import org.objectweb.asm.tree.MethodNode;
 
 
 /**
- *
+ * A
  */
 public class BeginEndMethodVisitor implements MethodVisitor, Opcodes
 {
-    private final static int CLEARED = 0;
-    private final static int NEED_START_LABEL = 1;
 
     private final static String CLASS_NAME = BeginEndMethodVisitor.class.getName();
     private final static Logger LOGGER = Logger.getLogger(CLASS_NAME);
@@ -46,7 +44,7 @@ public class BeginEndMethodVisitor implements MethodVisitor, Opcodes
     private final LocalVariablesSorter lvs;
     private final MethodNode methodNode;
     private final MethodVisitor visitor;
-    private int state = CLEARED;
+    private State state = State.CLEARED;
     private final Label l7 = new Label();
     private Label start;
     private boolean sawCode = false;
@@ -95,7 +93,7 @@ public class BeginEndMethodVisitor implements MethodVisitor, Opcodes
 
         for (BeginEndMethodListener listener : listeners) listener.begin(lvs);
 
-        state = NEED_START_LABEL;
+        state = State.NEED_START_LABEL;
 
         LOGGER.exiting(CLASS_NAME, "visitCode");
     }
@@ -187,11 +185,11 @@ public class BeginEndMethodVisitor implements MethodVisitor, Opcodes
 
     public void visitLabel(Label label)
     {
-        if (state == NEED_START_LABEL)
+        if (state == State.NEED_START_LABEL)
         {
             start = new Label();
             lvs.visitLabel(start);
-            state = CLEARED;
+            state = State.CLEARED;
         }
         lvs.visitLabel(label);
     }
@@ -283,11 +281,16 @@ public class BeginEndMethodVisitor implements MethodVisitor, Opcodes
 
     private void flush()
     {
-        if (state == NEED_START_LABEL)
+        if (state == State.NEED_START_LABEL)
         {
             start = new Label();
             lvs.visitLabel(start);
-            state = CLEARED;
+            state = State.CLEARED;
         }
+    }
+
+    private static enum State
+    {
+        NEED_START_LABEL, CLEARED
     }
 }
