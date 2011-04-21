@@ -84,7 +84,7 @@ public class IronClassVisitor implements ClassVisitor, Opcodes
             mv = delegate.visitMethod(access, name, desc, signature, exceptions);
         }
 
-        BeginEndMethodVisitor bemv = new BeginEndMethodVisitor(mv, clazz, access, name, desc, signature, exceptions);
+        BeginEndMethodVisitor bemv = new BeginEndMethodVisitor(mv, access, name, desc, signature, exceptions);
 
         bemv.getListeners().add(new BeginEndMethodListener()
         {
@@ -109,7 +109,7 @@ public class IronClassVisitor implements ClassVisitor, Opcodes
         {
             LOGGER.finest("Method is synchronized");
 
-            final Type classType = Type.getType("L" + clazz + ";.class");
+            final Type classType = Type.getType("L" + clazz.replaceAll("\\.", "/") + ";.class");
             if (isStatic)
             {
                 LOGGER.finest("Method is static");
@@ -167,7 +167,7 @@ public class IronClassVisitor implements ClassVisitor, Opcodes
             if (!isStatic) adapter.visitVarInsn(ALOAD, args++);
             for (Type param : Type.getArgumentTypes(desc))
             {
-                adapter.visitVarInsn(param.getOpcode(Opcodes.ILOAD), args++);
+                adapter.visitVarInsn(param.getOpcode(ILOAD), args++);
             }
             adapter.visitMethodInsn((isStatic ? INVOKESTATIC : INVOKEVIRTUAL), clazz.replaceAll("\\.", "/"), name, desc);
 

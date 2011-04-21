@@ -51,10 +51,9 @@ public class BeginEndMethodVisitor implements MethodVisitor, Opcodes
     private Label start;
     private boolean sawCode = false;
 
-    public BeginEndMethodVisitor(MethodVisitor visitor, String clazz, int access, String name, String desc, String signature, String[] exceptions)
+    public BeginEndMethodVisitor(MethodVisitor visitor, int access, String name, String desc, String signature, String[] exceptions)
     {
         assert visitor != null;
-        assert clazz != null;
         assert name != null;
         assert desc != null;
 
