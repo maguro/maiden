@@ -25,5 +25,5 @@ import java.security.ProtectionDomain;
  */
 public interface Dispatcher
 {
-    ClassFileTransformer lookup(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain);
+    ClassFileTransformer lookup(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, boolean nativeMethodPrefixSupported);
 }

@@ -34,6 +34,7 @@ import com.toolazydogs.maiden.agent.api.Dispatcher;
  */
 final public class IronAgent
 {
+    public final static String NATIVE_METHOD_PREFIX = "com_toolazydogs_maiden_";
     public final static String DISPATCHER_CLASS = "dispatcher";
     private final static String CLASS_NAME = IronAgent.class.getName();
     private final static Logger LOGGER = Logger.getLogger(CLASS_NAME);
@@ -117,9 +118,14 @@ final public class IronAgent
             Constructor<Dispatcher> constructor = dc.getConstructor(Properties.class);
             Dispatcher dispatcher = constructor.newInstance(properties);
 
-            ClassFileTransformer transformer = new IronTransformer(dispatcher);
+            boolean nativeMethodPrefixSupported = instrumentation.isNativeMethodPrefixSupported();
+            ClassFileTransformer transformer = new IronTransformer(dispatcher, nativeMethodPrefixSupported);
             instrumentation.addTransformer(transformer);
-            instrumentation.setNativeMethodPrefix(transformer, "maiden");
+
+            if (nativeMethodPrefixSupported)
+            {
+                instrumentation.setNativeMethodPrefix(transformer, NATIVE_METHOD_PREFIX);
+            }
         }
         catch (ClassNotFoundException e)
         {

@@ -42,9 +42,11 @@ public class PrintClassNameTransformer implements ClassFileTransformer
 {
     private final static String CLASS_NAME = PrintClassNameTransformer.class.getName();
     private final static Logger LOGGER = Logger.getLogger(CLASS_NAME);
+    private final boolean nativeMethodPrefixSupported;
 
-    public PrintClassNameTransformer(Properties properties)
+    public PrintClassNameTransformer(Properties properties, boolean nativeMethodPrefixSupported)
     {
+        this.nativeMethodPrefixSupported = nativeMethodPrefixSupported;
     }
 
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException
@@ -53,7 +55,7 @@ public class PrintClassNameTransformer implements ClassFileTransformer
 
         ClassReader reader = new ClassReader(classfileBuffer);
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
-        reader.accept(new IronClassVisitor(className, writer), ClassReader.EXPAND_FRAMES);
+        reader.accept(new IronClassVisitor(className, nativeMethodPrefixSupported, writer), ClassReader.EXPAND_FRAMES);
 
         byte[] result = writer.toByteArray();
 

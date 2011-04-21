@@ -35,19 +35,26 @@ public final class IronTransformer implements ClassFileTransformer, Opcodes
     private final static String CLASS_NAME = IronTransformer.class.getName();
     private final static Logger LOGGER = Logger.getLogger(CLASS_NAME);
     private final Dispatcher dispatcher;
+    private final boolean nativeMethodPrefixSupported;
 
     public IronTransformer(Dispatcher dispatcher)
+    {
+        this(dispatcher, false);
+    }
+
+    public IronTransformer(Dispatcher dispatcher, boolean nativeMethodPrefixSupported)
     {
         assert dispatcher != null;
 
         this.dispatcher = dispatcher;
+        this.nativeMethodPrefixSupported = nativeMethodPrefixSupported;
     }
 
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException
     {
         LOGGER.entering(CLASS_NAME, "transform", new Object[]{loader, className, classBeingRedefined, protectionDomain, classfileBuffer});
 
-        ClassFileTransformer transformer = dispatcher.lookup(loader, className, classBeingRedefined, protectionDomain);
+        ClassFileTransformer transformer = dispatcher.lookup(loader, className, classBeingRedefined, protectionDomain, nativeMethodPrefixSupported);
 
         byte[] results = transformer.transform(loader, className, classBeingRedefined, protectionDomain, classfileBuffer);
 

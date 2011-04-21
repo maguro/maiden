@@ -42,15 +42,15 @@ final class DefaultDispatcher implements Dispatcher
         this.properties = properties;
     }
 
-    public ClassFileTransformer lookup(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain)
+    public ClassFileTransformer lookup(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, boolean nativeMethodPrefixSupported)
     {
-        LOGGER.entering(CLASS_NAME, "lookup", new Object[]{loader, className, classBeingRedefined, protectionDomain});
+        LOGGER.entering(CLASS_NAME, "lookup", new Object[]{loader, className, classBeingRedefined, protectionDomain, nativeMethodPrefixSupported});
 
         if (className.startsWith("com/toolazydogs/maiden")) return DO_NOTHING;
         if (className.startsWith("com/google/inject/internal")) return DO_NOTHING;
         if (className.startsWith("sun/tools/attach")) return DO_NOTHING;
 
-        ClassFileTransformer transformer = new PrintClassNameTransformer(properties);
+        ClassFileTransformer transformer = new PrintClassNameTransformer(properties, nativeMethodPrefixSupported);
 
         LOGGER.exiting(CLASS_NAME, "lookup", transformer);
 

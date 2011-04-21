@@ -21,7 +21,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
 
-import com.acme.Pojo;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.util.CheckClassAdapter;
@@ -36,14 +35,6 @@ import com.toolazydogs.maiden.agent.asm.IronClassVisitor;
  */
 public class Tests
 {
-    @Test
-    public void test() throws Exception
-    {
-        Pojo pojo = new Pojo();
-
-        pojo.setName("Test");
-    }
-
     @Test
     public void t() throws Exception
     {
@@ -66,7 +57,7 @@ public class Tests
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
 
         ClassReader reader = new ClassReader(out.toByteArray());
-        reader.accept(new IronClassVisitor(clazz, writer), ClassReader.EXPAND_FRAMES);
+        reader.accept(new IronClassVisitor(clazz, true, writer), ClassReader.EXPAND_FRAMES);
 
         reader = new ClassReader(writer.toByteArray());
 

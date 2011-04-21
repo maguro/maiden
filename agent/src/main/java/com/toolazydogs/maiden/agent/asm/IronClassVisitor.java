@@ -22,9 +22,12 @@ import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
+import org.objectweb.asm.MethodAdapter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
+
+import com.toolazydogs.maiden.agent.IronAgent;
 
 
 /**
@@ -35,14 +38,16 @@ public class IronClassVisitor implements ClassVisitor, Opcodes
     private final static String CLASS_NAME = IronClassVisitor.class.getName();
     private final static Logger LOGGER = Logger.getLogger(CLASS_NAME);
     private final String clazz;
+    private final boolean nativeMethodPrefixSupported;
     private final ClassVisitor delegate;
 
-    public IronClassVisitor(String clazz, ClassVisitor delegate)
+    public IronClassVisitor(String clazz, boolean nativeMethodPrefixSupported, ClassVisitor delegate)
     {
         assert clazz != null;
         assert delegate != null;
 
         this.clazz = clazz;
+        this.nativeMethodPrefixSupported = nativeMethodPrefixSupported;
         this.delegate = delegate;
     }
 
@@ -64,10 +69,24 @@ public class IronClassVisitor implements ClassVisitor, Opcodes
     {
         LOGGER.entering(CLASS_NAME, "visitMethod", new Object[]{access, name, desc, signature, exceptions});
 
-        MethodVisitor mv = delegate.visitMethod(access, name, desc, signature, exceptions);
-        BeginEndMethodVisitor vmv = new BeginEndMethodVisitor(mv, clazz, access,  name, desc, signature, exceptions);
+        boolean isNative = (access & ACC_NATIVE) != 0;
+        boolean isSynchronized = (access & ACC_SYNCHRONIZED) != 0;
+        boolean isStatic = (access & ACC_STATIC) != 0;
+        MethodVisitor mv;
+        if (nativeMethodPrefixSupported && isNative)
+        {
+            delegate.visitMethod(access, IronAgent.NATIVE_METHOD_PREFIX + name, desc, signature, exceptions);
 
-        vmv.getListeners().add(new BeginEndMethodListener()
+            mv = delegate.visitMethod(access ^ ACC_NATIVE, name, desc, signature, exceptions);
+        }
+        else
+        {
+            mv = delegate.visitMethod(access, name, desc, signature, exceptions);
+        }
+
+        BeginEndMethodVisitor bemv = new BeginEndMethodVisitor(mv, clazz, access, name, desc, signature, exceptions);
+
+        bemv.getListeners().add(new BeginEndMethodListener()
         {
             @Override
             public void begin(MethodVisitor visitor)
@@ -86,15 +105,15 @@ public class IronClassVisitor implements ClassVisitor, Opcodes
             }
         });
 
-        if ((access & ACC_SYNCHRONIZED) != 0)
+        if (isSynchronized)
         {
             LOGGER.finest("Method is synchronized");
 
             final Type classType = Type.getType("L" + clazz + ";.class");
-            if ((access & ACC_STATIC) != 0)
+            if (isStatic)
             {
                 LOGGER.finest("Method is static");
-                vmv.getListeners().add(new BeginEndMethodListener()
+                bemv.getListeners().add(new BeginEndMethodListener()
                 {
                     @Override
                     public void begin(MethodVisitor visitor)
@@ -116,7 +135,7 @@ public class IronClassVisitor implements ClassVisitor, Opcodes
             else
             {
                 LOGGER.finest("Method is not static");
-                vmv.getListeners().add(new BeginEndMethodListener()
+                bemv.getListeners().add(new BeginEndMethodListener()
                 {
                     @Override
                     public void begin(MethodVisitor visitor)
@@ -137,7 +156,26 @@ public class IronClassVisitor implements ClassVisitor, Opcodes
             }
         }
 
-        MethodVisitor result = new MonitorMethodVisitor(vmv);
+        MethodVisitor result = new MonitorMethodVisitor(bemv);
+
+        if (nativeMethodPrefixSupported && isNative)
+        {
+            MethodAdapter adapter = new MethodAdapter(result);
+            adapter.visitCode();
+
+            int args = 0;
+            if (!isStatic) adapter.visitVarInsn(ALOAD, args++);
+            for (Type param : Type.getArgumentTypes(desc))
+            {
+                adapter.visitVarInsn(param.getOpcode(Opcodes.ILOAD), args++);
+            }
+            adapter.visitMethodInsn((isStatic ? INVOKESTATIC : INVOKEVIRTUAL), clazz.replaceAll("\\.", "/"), name, desc);
+
+            adapter.visitInsn(RETURN);
+            adapter.visitEnd();
+
+            result = null;
+        }
 
         LOGGER.exiting(CLASS_NAME, "visitMethod", result);
 

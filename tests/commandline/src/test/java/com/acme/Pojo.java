@@ -61,8 +61,14 @@ public class Pojo
     {
     }
 
-    public static native void nativeMethod();
+    public synchronized native void setName(String name, int j) throws Exception;
 
+    public native static void z_a(String name, int j) throws Exception;
+
+    public synchronized static void a(String name, int j) throws Exception
+    {
+        z_a(name, j);
+    }
     public void writeMessage( String message )
     {
     }
@@ -70,11 +76,6 @@ public class Pojo
     public String getName()
     {
         return name;
-    }
-
-    public synchronized void setName(String name)
-    {
-        this.name = name;
     }
 
     public static synchronized void bar(Object[] array)
@@ -115,7 +116,7 @@ public class Pojo
 //        }
     }
 
-    public void foo(byte[] array) throws InterruptedException
+    public void foo(byte[] array) throws Exception
     {
         LOGGER.wait();
         vInteger = vint = 2;
@@ -128,7 +129,7 @@ public class Pojo
         {
             System.err.println("ENTER " + Thread.currentThread().getId());
 
-            setName("test");
+            setName("test", 9);
 
             int size = array.length;
             int hash = array.hashCode();

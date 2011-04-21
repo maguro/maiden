@@ -80,13 +80,13 @@ public class BeginEndMethodVisitor implements MethodVisitor, Opcodes
         return reversed;
     }
 
-    public AnnotationVisitor visitAnnotationDefault() { return lvs.visitAnnotationDefault();}
+    public AnnotationVisitor visitAnnotationDefault() { return lvs.visitAnnotationDefault(); }
 
-    public AnnotationVisitor visitAnnotation(String desc, boolean visible) { return lvs.visitAnnotation(desc, visible);}
+    public AnnotationVisitor visitAnnotation(String desc, boolean visible) { return lvs.visitAnnotation(desc, visible); }
 
-    public AnnotationVisitor visitParameterAnnotation(int parameter, String desc, boolean visible) {return lvs.visitParameterAnnotation(parameter, desc, visible);}
+    public AnnotationVisitor visitParameterAnnotation(int parameter, String desc, boolean visible) { return lvs.visitParameterAnnotation(parameter, desc, visible); }
 
-    public void visitAttribute(Attribute attr) {lvs.visitAttribute(attr);}
+    public void visitAttribute(Attribute attr) { lvs.visitAttribute(attr); }
 
     public void visitCode()
     {
@@ -128,8 +128,6 @@ public class BeginEndMethodVisitor implements MethodVisitor, Opcodes
 
                 for (BeginEndMethodListener listener : getReversed()) listener.end(lvs);
 
-                start = null;
-                state = NEED_START_LABEL;
 
                 break;
 
@@ -256,6 +254,11 @@ public class BeginEndMethodVisitor implements MethodVisitor, Opcodes
     public void visitMaxs(int maxStack, int maxLocals)
     {
         flush();
+    }
+
+    public void visitEnd()
+    {
+        flush();
 
         if (sawCode)
         {
@@ -273,10 +276,7 @@ public class BeginEndMethodVisitor implements MethodVisitor, Opcodes
             lvs.visitVarInsn(ALOAD, local);
             lvs.visitInsn(ATHROW);
         }
-    }
 
-    public void visitEnd()
-    {
         lvs.visitEnd();
 
         methodNode.accept(visitor);

@@ -18,7 +18,6 @@ package com.toolazydogs.maiden.agent.asm;
 
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
 
 
 /**
@@ -30,7 +29,7 @@ public class AsmUtils
      * Generates the instruction to push the given value on the stack.
      *
      * @param methodVisitor the visitor to which to send the instruction
-     * @param value the value to be pushed on the stack.
+     * @param value         the value to be pushed on the stack.
      */
     public static void push(MethodVisitor methodVisitor, boolean value)
     {
@@ -41,7 +40,7 @@ public class AsmUtils
      * Generates the instruction to push the given value on the stack.
      *
      * @param methodVisitor the visitor to which to send the instruction
-     * @param value the value to be pushed on the stack.
+     * @param value         the value to be pushed on the stack.
      */
     public static void push(MethodVisitor methodVisitor, int value)
     {
@@ -62,4 +61,6 @@ public class AsmUtils
             methodVisitor.visitLdcInsn(value);
         }
     }
+
+    private AsmUtils() { }
 }
