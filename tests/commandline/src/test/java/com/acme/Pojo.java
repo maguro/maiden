@@ -78,13 +78,14 @@ public class Pojo
         return name;
     }
 
-    public static synchronized void bar(Object[] array)
+    public static synchronized void bar(Object[] array) throws InterruptedException
     {
         int i = 0;
         for (int j = i; j < 100000; i++)
         {
             Object t = array[0];
             array[1] = t;
+            array.wait(6, 1);
         }
     }
 

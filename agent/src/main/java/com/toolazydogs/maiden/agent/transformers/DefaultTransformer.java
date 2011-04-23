@@ -16,13 +16,6 @@
  */
 package com.toolazydogs.maiden.agent.transformers;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
@@ -38,13 +31,13 @@ import com.toolazydogs.maiden.agent.asm.IronClassVisitor;
 /**
  *
  */
-public class PrintClassNameTransformer implements ClassFileTransformer
+public class DefaultTransformer implements ClassFileTransformer
 {
-    private final static String CLASS_NAME = PrintClassNameTransformer.class.getName();
+    private final static String CLASS_NAME = DefaultTransformer.class.getName();
     private final static Logger LOGGER = Logger.getLogger(CLASS_NAME);
     private final boolean nativeMethodPrefixSupported;
 
-    public PrintClassNameTransformer(Properties properties, boolean nativeMethodPrefixSupported)
+    public DefaultTransformer(Properties properties, boolean nativeMethodPrefixSupported)
     {
         this.nativeMethodPrefixSupported = nativeMethodPrefixSupported;
     }

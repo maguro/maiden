@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 
 import com.toolazydogs.maiden.agent.api.Dispatcher;
 import com.toolazydogs.maiden.agent.transformers.DoNothingTransformer;
-import com.toolazydogs.maiden.agent.transformers.PrintClassNameTransformer;
+import com.toolazydogs.maiden.agent.transformers.DefaultTransformer;
 
 
 /**
@@ -50,7 +50,7 @@ final class DefaultDispatcher implements Dispatcher
         if (className.startsWith("com/google/inject/internal")) return DO_NOTHING;
         if (className.startsWith("sun/tools/attach")) return DO_NOTHING;
 
-        ClassFileTransformer transformer = new PrintClassNameTransformer(properties, nativeMethodPrefixSupported);
+        ClassFileTransformer transformer = new DefaultTransformer(properties, nativeMethodPrefixSupported);
 
         LOGGER.exiting(CLASS_NAME, "lookup", transformer);
 

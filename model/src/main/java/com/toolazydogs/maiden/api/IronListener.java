@@ -48,11 +48,13 @@ public interface IronListener
 
     void putStatic(int line, Class clazz, String name);
 
-    void waitStart(int line, Object object);
+    void waitStart(int line, Object object) throws InterruptedException;
 
-    void waitStop(int line, Object object);
+    void waitStart(int line, Object object, long milliseconds) throws InterruptedException;
 
-    void notifyFirstObject(int line, Object object);
+    void waitStart(int line, Object object, long milliseconds, int nanoseconds) throws InterruptedException;
 
-    void notifyAllObjects(int line, Object object);
+    void notifyObject(int line, Object object);
+
+    void notifyAllObject(int line, Object object);
 }

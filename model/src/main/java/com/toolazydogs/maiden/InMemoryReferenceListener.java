@@ -28,9 +28,9 @@ import com.toolazydogs.maiden.model.Region;
 /**
  *
  */
-public class InMemoryIronListener implements IronListener
+public class InMemoryReferenceListener implements IronListener
 {
-    private final static String CLASS_NAME = InMemoryIronListener.class.getName();
+    private final static String CLASS_NAME = InMemoryReferenceListener.class.getName();
     private final static Logger LOGGER = Logger.getLogger(CLASS_NAME);
     private final ThreadLocal<Line> LINE = new ThreadLocal<Line>();
     private final ThreadLocal<Region> PARENT = new ThreadLocal<Region>();
@@ -161,17 +161,22 @@ public class InMemoryIronListener implements IronListener
         //Todo change body of implemented methods use File | Settings | File Templates.
     }
 
-    public void waitStop(int line, Object object)
+    public void waitStart(int line, Object object, long milliseconds) throws InterruptedException
     {
         //Todo change body of implemented methods use File | Settings | File Templates.
     }
 
-    public void notifyFirstObject(int line, Object object)
+    public void waitStart(int line, Object object, long milliseconds, int nanoseconds) throws InterruptedException
     {
         //Todo change body of implemented methods use File | Settings | File Templates.
     }
 
-    public void notifyAllObjects(int line, Object object)
+    public void notifyObject(int line, Object object)
+    {
+        //Todo change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void notifyAllObject(int line, Object object)
     {
         //Todo change body of implemented methods use File | Settings | File Templates.
     }

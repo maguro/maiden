@@ -62,5 +62,23 @@ public class AsmUtils
         }
     }
 
+    /**
+     * Generates the instruction to push the given value on the stack.
+     *
+     * @param methodVisitor the visitor to which to send the instruction
+     * @param value         the value to be pushed on the stack.
+     */
+    public static void push(MethodVisitor methodVisitor, long value)
+    {
+        if (value == 0L || value == 1L)
+        {
+            methodVisitor.visitInsn(Opcodes.LCONST_0 + (int)value);
+        }
+        else
+        {
+            methodVisitor.visitLdcInsn(value);
+        }
+    }
+
     private AsmUtils() { }
 }

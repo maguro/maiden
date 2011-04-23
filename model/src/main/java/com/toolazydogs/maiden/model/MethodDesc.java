@@ -59,10 +59,7 @@ public class MethodDesc
 
         MethodDesc that = (MethodDesc)o;
 
-        if (!classname.equals(that.classname)) return false;
-        if (!desc.equals(that.desc)) return false;
-        return name.equals(that.name);
-
+        return classname.equals(that.classname) && desc.equals(that.desc) && name.equals(that.name);
     }
 
     @Override

@@ -81,29 +81,12 @@ public class IronClassVisitor implements ClassVisitor, Opcodes
         }
         else
         {
-            mv = delegate.visitMethod(access, name, desc, signature, exceptions);
+            mv = delegate.visitMethod((isSynchronized ? access ^ ACC_SYNCHRONIZED : access), name, desc, signature, exceptions);
         }
 
+        mv = new WaitNotifyMethodVisitor(mv);
+
         BeginEndMethodVisitor bemv = new BeginEndMethodVisitor(mv, access, name, desc, signature, exceptions);
-
-        bemv.getListeners().add(new BeginEndMethodListener()
-        {
-            @Override
-            public void begin(MethodVisitor visitor)
-            {
-                visitor.visitLdcInsn(clazz);
-                visitor.visitLdcInsn(name);
-                visitor.visitLdcInsn(desc);
-                visitor.visitMethodInsn(INVOKESTATIC, "com/toolazydogs/maiden/IronMaiden", "push", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
-            }
-
-            @Override
-            public void end(MethodVisitor visitor)
-            {
-                AsmUtils.push(visitor, line);
-                visitor.visitMethodInsn(INVOKESTATIC, "com/toolazydogs/maiden/IronMaiden", "pop", "(I)V");
-            }
-        });
 
         if (isSynchronized)
         {
@@ -155,6 +138,25 @@ public class IronClassVisitor implements ClassVisitor, Opcodes
                 });
             }
         }
+
+        bemv.getListeners().add(new BeginEndMethodListener()
+        {
+            @Override
+            public void begin(MethodVisitor visitor)
+            {
+                visitor.visitLdcInsn(clazz);
+                visitor.visitLdcInsn(name);
+                visitor.visitLdcInsn(desc);
+                visitor.visitMethodInsn(INVOKESTATIC, "com/toolazydogs/maiden/IronMaiden", "push", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
+            }
+
+            @Override
+            public void end(MethodVisitor visitor)
+            {
+                AsmUtils.push(visitor, line);
+                visitor.visitMethodInsn(INVOKESTATIC, "com/toolazydogs/maiden/IronMaiden", "pop", "(I)V");
+            }
+        });
 
         MethodVisitor result = new MonitorMethodVisitor(bemv);
 

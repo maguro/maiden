@@ -36,9 +36,11 @@ public class IronMaidenTest
 {
     /**
      * There should always at least be a default listener in place.
+     *
+     * @throws Exception if an error occurs
      */
     @Test
-    public void testDefault()
+    public void testDefault() throws Exception
     {
         IronMaiden.push("CLASS", "METHOD", "DESC");
         IronMaiden.pop(1);
@@ -53,9 +55,8 @@ public class IronMaidenTest
         IronMaiden.putStatic(10, this.getClass(), "field");
         IronMaiden.getStatic(11, this.getClass(), "field");
         IronMaiden.waitStart(12, this);
-        IronMaiden.waitStop(13, this);
-        IronMaiden.notifyFirstObject(14, this);
-        IronMaiden.notifyAllObjects(15, this);
+        IronMaiden.notifyObject(13, this);
+        IronMaiden.notifyAllObject(14, this);
     }
 
     @Test
@@ -79,7 +80,7 @@ public class IronMaidenTest
     }
 
     @Test
-    public void testListener()
+    public void testListener() throws Exception
     {
         IronListener listener = mock(IronListener.class);
         IronContext context = IronMaiden.allocateContext();
@@ -101,9 +102,8 @@ public class IronMaidenTest
         IronMaiden.putStatic(10, this.getClass(), "field");
         IronMaiden.getStatic(11, this.getClass(), "field");
         IronMaiden.waitStart(12, this);
-        IronMaiden.waitStop(13, this);
-        IronMaiden.notifyFirstObject(14, this);
-        IronMaiden.notifyAllObjects(15, this);
+        IronMaiden.notifyObject(13, this);
+        IronMaiden.notifyAllObject(14, this);
 
         inOrder.verify(listener).push("CLASS", "METHOD", "DESC");
         inOrder.verify(listener).pop(1);
@@ -118,9 +118,8 @@ public class IronMaidenTest
         inOrder.verify(listener).putStatic(10, this.getClass(), "field");
         inOrder.verify(listener).getStatic(11, this.getClass(), "field");
         inOrder.verify(listener).waitStart(12, this);
-        inOrder.verify(listener).waitStop(13, this);
-        inOrder.verify(listener).notifyFirstObject(14, this);
-        inOrder.verify(listener).notifyAllObjects(15, this);
+        inOrder.verify(listener).notifyObject(13, this);
+        inOrder.verify(listener).notifyAllObject(14, this);
 
         assertTrue(context.removeListener(listener));
     }

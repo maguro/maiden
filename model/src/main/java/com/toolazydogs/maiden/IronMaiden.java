@@ -242,7 +242,7 @@ public class IronMaiden
         }
     }
 
-    public static void waitStart(int line, Object object)
+    public static void waitStart(int line, Object object) throws InterruptedException
     {
         if (INSIDE.get()) return;
         else INSIDE.set(true);
@@ -257,14 +257,14 @@ public class IronMaiden
         }
     }
 
-    public static void waitStop(int line, Object object)
+    public static void waitStart(int line, Object object, long milliseconds) throws InterruptedException
     {
         if (INSIDE.get()) return;
         else INSIDE.set(true);
 
         try
         {
-            for (IronListener listener : LISTENERS) listener.waitStop(line, object);
+            for (IronListener listener : LISTENERS) listener.waitStart(line, object);
         }
         finally
         {
@@ -272,14 +272,14 @@ public class IronMaiden
         }
     }
 
-    public static void notifyFirstObject(int line, Object object)
+    public static void waitStart(int line, Object object, long milliseconds, int nanoseconds) throws InterruptedException
     {
         if (INSIDE.get()) return;
         else INSIDE.set(true);
 
         try
         {
-            for (IronListener listener : LISTENERS) listener.notifyFirstObject(line, object);
+            for (IronListener listener : LISTENERS) listener.waitStart(line, object);
         }
         finally
         {
@@ -287,14 +287,29 @@ public class IronMaiden
         }
     }
 
-    public static void notifyAllObjects(int line, Object object)
+    public static void notifyObject(int line, Object object)
     {
         if (INSIDE.get()) return;
         else INSIDE.set(true);
 
         try
         {
-            for (IronListener listener : LISTENERS) listener.notifyAllObjects(line, object);
+            for (IronListener listener : LISTENERS) listener.notifyObject(line, object);
+        }
+        finally
+        {
+            INSIDE.set(false);
+        }
+    }
+
+    public static void notifyAllObject(int line, Object object)
+    {
+        if (INSIDE.get()) return;
+        else INSIDE.set(true);
+
+        try
+        {
+            for (IronListener listener : LISTENERS) listener.notifyAllObject(line, object);
         }
         finally
         {
