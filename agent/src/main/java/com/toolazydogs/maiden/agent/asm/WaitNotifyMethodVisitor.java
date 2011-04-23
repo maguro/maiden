@@ -61,6 +61,8 @@ public class WaitNotifyMethodVisitor implements MethodVisitor, Opcodes
 
     public void visitInsn(int opcode)
     {
+        LOGGER.entering(CLASS_NAME, "visitInsn", opcode);
+
         if (state == State.FOUND_ALOAD0 && (opcode == LCONST_0 || opcode == LCONST_1))
         {
             milliseconds = opcode - LCONST_0;
@@ -76,10 +78,14 @@ public class WaitNotifyMethodVisitor implements MethodVisitor, Opcodes
             flush();
             visitor.visitInsn(opcode);
         }
+
+        LOGGER.exiting(CLASS_NAME, "visitInsn");
     }
 
     public void visitIntInsn(int opcode, int operand)
     {
+        LOGGER.entering(CLASS_NAME, "visitInsn", new Object[]{opcode, operand});
+
         if (state == State.FOUND_MILLISECONDS && (opcode == Opcodes.BIPUSH || opcode == Opcodes.SIPUSH))
         {
             nanoseconds = opcode;
@@ -90,10 +96,14 @@ public class WaitNotifyMethodVisitor implements MethodVisitor, Opcodes
             flush();
             visitor.visitIntInsn(opcode, operand);
         }
+
+        LOGGER.exiting(CLASS_NAME, "visitIntInsn");
     }
 
     public void visitVarInsn(int opcode, int var)
     {
+        LOGGER.entering(CLASS_NAME, "visitVarInsn", new Object[]{opcode, var});
+
         if (state == State.NONE && opcode == ALOAD && var == 0)
         {
             state = State.FOUND_ALOAD0;
@@ -103,6 +113,8 @@ public class WaitNotifyMethodVisitor implements MethodVisitor, Opcodes
             flush();
             visitor.visitVarInsn(opcode, var);
         }
+
+        LOGGER.exiting(CLASS_NAME, "visitVarInsn");
     }
 
     public void visitTypeInsn(int opcode, String type)
@@ -119,6 +131,8 @@ public class WaitNotifyMethodVisitor implements MethodVisitor, Opcodes
 
     public void visitMethodInsn(int opcode, String owner, String name, String desc)
     {
+        LOGGER.entering(CLASS_NAME, "visitVarInsn", new Object[]{opcode, owner, name, desc});
+
         if (opcode == INVOKEVIRTUAL)
         {
             boolean wait = "java/lang/Object".equals(owner) && "wait".equals(name);
@@ -182,6 +196,8 @@ public class WaitNotifyMethodVisitor implements MethodVisitor, Opcodes
             flush();
             visitor.visitMethodInsn(opcode, owner, name, desc);
         }
+
+        LOGGER.exiting(CLASS_NAME, "visitMethodInsn");
     }
 
     public void visitJumpInsn(int opcode, Label label)
@@ -198,6 +214,8 @@ public class WaitNotifyMethodVisitor implements MethodVisitor, Opcodes
 
     public void visitLdcInsn(Object cst)
     {
+        LOGGER.exiting(CLASS_NAME, "visitLdcInsn", cst);
+
         if (state == State.FOUND_ALOAD0 && cst instanceof Long)
         {
             milliseconds = (Long)cst;
@@ -213,6 +231,8 @@ public class WaitNotifyMethodVisitor implements MethodVisitor, Opcodes
             flush();
             visitor.visitLdcInsn(cst);
         }
+
+        LOGGER.exiting(CLASS_NAME, "visitLdcInsn");
     }
 
     public void visitIincInsn(int var, int increment)
@@ -272,6 +292,8 @@ public class WaitNotifyMethodVisitor implements MethodVisitor, Opcodes
 
     private void flush()
     {
+        LOGGER.entering(CLASS_NAME, "flush");
+
         if (state == State.FOUND_ALOAD0)
         {
             visitor.visitVarInsn(ALOAD, 0);
@@ -288,6 +310,8 @@ public class WaitNotifyMethodVisitor implements MethodVisitor, Opcodes
             AsmUtils.push(visitor, nanoseconds);
         }
         state = State.NONE;
+
+        LOGGER.exiting(CLASS_NAME, "flush");
     }
 
     private enum State
