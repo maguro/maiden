@@ -55,8 +55,10 @@ public class IronMaidenTest
         IronMaiden.putStatic(10, this.getClass(), "field");
         IronMaiden.getStatic(11, this.getClass(), "field");
         IronMaiden.waitStart(12, this);
-        IronMaiden.notifyObject(13, this);
-        IronMaiden.notifyAllObject(14, this);
+        IronMaiden.waitStart(13, this, 1);
+        IronMaiden.waitStart(14, this, 1, 2);
+        IronMaiden.notifyObject(15, this);
+        IronMaiden.notifyAllObject(16, this);
     }
 
     @Test
@@ -102,8 +104,10 @@ public class IronMaidenTest
         IronMaiden.putStatic(10, this.getClass(), "field");
         IronMaiden.getStatic(11, this.getClass(), "field");
         IronMaiden.waitStart(12, this);
-        IronMaiden.notifyObject(13, this);
-        IronMaiden.notifyAllObject(14, this);
+        IronMaiden.waitStart(13, this, 1);
+        IronMaiden.waitStart(14, this, 1, 2);
+        IronMaiden.notifyObject(15, this);
+        IronMaiden.notifyAllObject(16, this);
 
         inOrder.verify(listener).push("CLASS", "METHOD", "DESC");
         inOrder.verify(listener).pop(1);
@@ -118,8 +122,10 @@ public class IronMaidenTest
         inOrder.verify(listener).putStatic(10, this.getClass(), "field");
         inOrder.verify(listener).getStatic(11, this.getClass(), "field");
         inOrder.verify(listener).waitStart(12, this);
-        inOrder.verify(listener).notifyObject(13, this);
-        inOrder.verify(listener).notifyAllObject(14, this);
+        inOrder.verify(listener).waitStart(13, this, 1);
+        inOrder.verify(listener).waitStart(14, this, 1, 2);
+        inOrder.verify(listener).notifyObject(15, this);
+        inOrder.verify(listener).notifyAllObject(16, this);
 
         assertTrue(context.removeListener(listener));
     }

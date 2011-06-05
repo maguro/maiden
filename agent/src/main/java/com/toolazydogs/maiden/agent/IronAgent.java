@@ -24,11 +24,12 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.toolazydogs.maiden.InMemoryDeadlockListener;
+import com.toolazydogs.maiden.InMemoryCallListener;
 import com.toolazydogs.maiden.InMemoryReferenceListener;
 import com.toolazydogs.maiden.IronMaiden;
 import com.toolazydogs.maiden.agent.api.Dispatcher;
 import com.toolazydogs.maiden.api.IronContext;
+import com.toolazydogs.maiden.lock.InMemoryDeadlockListener;
 
 
 /**
@@ -103,6 +104,7 @@ final public class IronAgent
         }
 
         IronContext context = IronMaiden.allocateContext();
+        context.addListener(new InMemoryCallListener());
         context.addListener(new InMemoryReferenceListener());
         context.addListener(new InMemoryDeadlockListener());
 

@@ -24,6 +24,8 @@ import com.toolazydogs.maiden.model.Line;
  */
 public interface IronListener
 {
+    void call(int line, String classname, String name, String desc);
+
     void push(String classname, String name, String desc);
 
     void pop(int line);

@@ -77,7 +77,7 @@ public class IronClassVisitor implements ClassVisitor, Opcodes
         {
             delegate.visitMethod(access, IronAgent.NATIVE_METHOD_PREFIX + name, desc, signature, exceptions);
 
-            mv = delegate.visitMethod(access ^ ACC_NATIVE, name, desc, signature, exceptions);
+            mv = delegate.visitMethod(access ^ (ACC_NATIVE | ACC_SYNCHRONIZED), name, desc, signature, exceptions);
         }
         else
         {

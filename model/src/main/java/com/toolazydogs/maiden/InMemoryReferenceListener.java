@@ -52,6 +52,11 @@ public class InMemoryReferenceListener implements IronListener
         }
     };
 
+    public void call(int line, String classname, String name, String desc)
+    {
+        //Todo change body of implemented methods use File | Settings | File Templates.
+    }
+
     public void push(String classname, String name, String desc)
     {
 //        indent();

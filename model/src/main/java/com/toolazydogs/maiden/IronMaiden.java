@@ -264,7 +264,7 @@ public class IronMaiden
 
         try
         {
-            for (IronListener listener : LISTENERS) listener.waitStart(line, object);
+            for (IronListener listener : LISTENERS) listener.waitStart(line, object, milliseconds);
         }
         finally
         {
@@ -279,7 +279,7 @@ public class IronMaiden
 
         try
         {
-            for (IronListener listener : LISTENERS) listener.waitStart(line, object);
+            for (IronListener listener : LISTENERS) listener.waitStart(line, object, milliseconds, nanoseconds);
         }
         finally
         {

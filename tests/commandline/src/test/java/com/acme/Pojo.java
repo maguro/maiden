@@ -45,6 +45,7 @@ public class Pojo
     private static int hookCounter;
     private static final String intern;
     private volatile Integer vInteger;
+    private State state = State.STOPPED;
 
     static
     {
@@ -76,6 +77,16 @@ public class Pojo
     public String getName()
     {
         return name;
+    }
+
+    public State getState()
+    {
+        return state;
+    }
+
+    public void setState(State state)
+    {
+        this.state = state;
     }
 
     public static synchronized void bar(Object[] array) throws InterruptedException
