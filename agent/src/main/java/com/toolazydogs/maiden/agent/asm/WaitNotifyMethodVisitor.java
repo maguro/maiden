@@ -135,9 +135,10 @@ public class WaitNotifyMethodVisitor implements MethodVisitor, Opcodes
 
         if (opcode == INVOKEVIRTUAL)
         {
-            boolean wait = "java/lang/Object".equals(owner) && "wait".equals(name);
-            boolean notify = "java/lang/Object".equals(owner) && "notify".equals(name);
-            boolean notifyAll = "java/lang/Object".equals(owner) && "notifyAll".equals(name);
+            boolean ownerIsObject = "java/lang/Object".equals(owner);
+            boolean wait = ownerIsObject && "wait".equals(name);
+            boolean notify = ownerIsObject && "notify".equals(name);
+            boolean notifyAll = ownerIsObject && "notifyAll".equals(name);
 
             if (wait)
             {
