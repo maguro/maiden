@@ -91,17 +91,11 @@ public class InMemoryDeadlockListener implements IronListener
         return listeners;
     }
 
-    public void call(int line, String classname, String name, String desc)
-    {
-    }
+    public void call(int line, String classname, String name, String desc) { }
 
-    public void push(String classname, String name, String desc)
-    {
-    }
+    public void push(String classname, String name, String desc) { }
 
-    public void pop(int line)
-    {
-    }
+    public void pop(int line) { }
 
     @SuppressWarnings({"SynchronizationOnLocalVariableOrMethodParameter"})
     public void lockObject(int line, Object object)
@@ -199,37 +193,21 @@ public class InMemoryDeadlockListener implements IronListener
         LOGGER.exiting(CLASS_NAME, "unlockObject");
     }
 
-    public void readVolatile(int line, Object object, String field)
-    {
-    }
+    public void readVolatile(int line, Object object, String field) { }
 
-    public void writeVolatile(int line, Object object, String field)
-    {
-    }
+    public void writeVolatile(int line, Object object, String field) { }
 
-    public void loadArray(int line, Object array, int index)
-    {
-    }
+    public void loadArray(int line, Object array, int index) { }
 
-    public void storeArray(int line, Object array, int index)
-    {
-    }
+    public void storeArray(int line, Object array, int index) { }
 
-    public void getField(int line, Object object, String name)
-    {
-    }
+    public void getField(int line, Object object, String name) { }
 
-    public void putField(int line, Object object, String name)
-    {
-    }
+    public void putField(int line, Object object, String name) { }
 
-    public void getStatic(int line, Class clazz, String name)
-    {
-    }
+    public void getStatic(int line, Class clazz, String name) { }
 
-    public void putStatic(int line, Class clazz, String name)
-    {
-    }
+    public void putStatic(int line, Class clazz, String name) { }
 
     @SuppressWarnings({"SynchronizationOnLocalVariableOrMethodParameter"})
     public void waitStart(int line, Object object) throws InterruptedException
