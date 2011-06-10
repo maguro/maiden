@@ -311,6 +311,8 @@ public class InMemoryDeadlockListener implements IronListener
                               }
                           }, 1000000 * milliseconds + nanoseconds, TimeUnit.NANOSECONDS);
 
+            if (LOGGER.isLoggable(Level.FINEST)) LOGGER.finest("Entering wait on " + System.identityHashCode(object));
+
             boolean done = false;
             while (!done)
             {
@@ -320,6 +322,12 @@ public class InMemoryDeadlockListener implements IronListener
                     done = true;
                     lockQueue.add(waiting);
                 }
+            }
+
+            if (LOGGER.isLoggable(Level.FINEST))
+            {
+                LOGGER.finest("Wait completed on " + System.identityHashCode(object));
+                LOGGER.finest("Waiting for re-lock on " + System.identityHashCode(object));
             }
 
             done = false;
@@ -337,6 +345,8 @@ public class InMemoryDeadlockListener implements IronListener
                     lock.count = lockQueue.poll().count;
                 }
             }
+
+            if (LOGGER.isLoggable(Level.FINEST)) LOGGER.finest("RESTORED " + System.identityHashCode(object) + " by " + lock.locked);
 
             broadcastLock(object);
         }

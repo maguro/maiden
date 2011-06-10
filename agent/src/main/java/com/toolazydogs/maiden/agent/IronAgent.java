@@ -93,8 +93,16 @@ final public class IronAgent
                 String[] keyValue = arg.split("=");
                 if (keyValue.length == 2)
                 {
-                    if (DISPATCHER_CLASS.equalsIgnoreCase(keyValue[0])) dn = keyValue[1];
-                    else properties.put(keyValue[0], keyValue[1]);
+                    if (DISPATCHER_CLASS.equalsIgnoreCase(keyValue[0]))
+                    {
+                        dn = keyValue[1];
+                        LOGGER.config("Dispatcher class set to " + dn);
+                    }
+                    else
+                    {
+                        properties.put(keyValue[0], keyValue[1]);
+                        LOGGER.config("Added " + keyValue[0] + " = " + keyValue[1]);
+                    }
                 }
                 else
                 {
@@ -131,6 +139,7 @@ final public class IronAgent
             if (nativeMethodPrefixSupported)
             {
                 instrumentation.setNativeMethodPrefix(transformer, NATIVE_METHOD_PREFIX);
+                LOGGER.config("Native method prefix supported");
             }
         }
         catch (ClassNotFoundException e)
