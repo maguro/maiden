@@ -26,7 +26,7 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <finalName>assemble-${pom.version}</finalName>
+                            <finalName>assemble-${project.version}</finalName>
                             <relocations>
                                 <relocation>
                                     <pattern>org.objectweb.asm</pattern>

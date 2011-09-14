@@ -39,7 +39,7 @@
                                 <artifactItem>
                                     <groupId>com.toolazydogs.maiden</groupId>
                                     <artifactId>assemble</artifactId>
-                                    <version>${pom.version}</version>
+                                    <version>${project.version}</version>
                                     <type>jar</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target</outputDirectory>
