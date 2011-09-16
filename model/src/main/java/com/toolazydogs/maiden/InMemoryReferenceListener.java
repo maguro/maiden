@@ -59,8 +59,6 @@ public class InMemoryReferenceListener implements IronListener
 
     public void push(String classname, String name, String desc)
     {
-//        indent();
-//        System.err.println("PUSH: " + classname + "." + name + " " + desc);
         CALL_STACK.get().push(new MethodDesc(classname, name, desc));
     }
 
@@ -78,14 +76,7 @@ public class InMemoryReferenceListener implements IronListener
             }
             System.exit(0);
         }
-        if (line == -1)
-        {
-//            System.err.print(System.identityHashCode(Thread.currentThread()));
-//            System.err.println("***** THROW ");
-        }
         MethodDesc methodDesc = CALL_STACK.get().pop();
-//        indent();
-//        System.err.println("POP:  " + methodDesc.getClassname() + "." + methodDesc.getName() + " " + methodDesc.getDesc() + "#" + line);
     }
 
     public void indent()
