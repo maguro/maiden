@@ -20,21 +20,43 @@ import org.objectweb.asm.MethodVisitor;
 
 
 /**
- *
+ * Implementations of this interface are notified when the beginning of a
+ * method has been encountered and <em>before</em> code that forces a thread
+ * to leave a method is executed.  This allows the listener to inject code
+ * before a method's code is executed and before the execution thread leaves
+ * the method.
+ * <p/>
+ * Helpful when there's different instructions to inject depending if the
+ * method being visisted is static or regular.
  */
 public class BeginEndMethodListener
 {
     protected int line;
 
+    /**
+     * Beginning of method has been encountered.
+     *
+     * @param visitor an instance of {@link MethodVisitor} that can be used to inject code
+     */
     public void begin(MethodVisitor visitor)
     {
     }
 
+    /**
+     * The current line number encountered.
+     *
+     * @param line the current line number encountered
+     */
     public void line(int line)
     {
         this.line = line;
     }
 
+    /**
+     * The end of the method is about to be visited.
+     *
+     * @param visitor an instance of {@link MethodVisitor} that can be used to inject code
+     */
     public void end(MethodVisitor visitor)
     {
     }
