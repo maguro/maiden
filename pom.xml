@@ -24,7 +24,6 @@
 
     <modules>
         <module>agent</module>
-        <module>assemble</module>
         <module>model</module>
     </modules>
 

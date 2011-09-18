@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import com.sun.tools.example.debug.gui.ThreadTreeTool;
 import com.toolazydogs.maiden.IronMaiden;
 import com.toolazydogs.maiden.model.Event;
 import com.toolazydogs.maiden.model.Line;
@@ -137,6 +138,9 @@ public class Pojo
         int i = vint;
         int j = vInteger;
 
+        Thread thread = new Thread(new TestRunnable());
+        thread.start();
+
         synchronized (LOGGER)
         {
             System.err.println("ENTER " + Thread.currentThread().getId());
@@ -159,4 +163,13 @@ public class Pojo
     }
 
     private static int vint;
+
+    class TestRunnable implements Runnable {
+
+        public void run()
+        {
+            name = "CABRERA";
+            System.out.println(name);
+        }
+    }
 }

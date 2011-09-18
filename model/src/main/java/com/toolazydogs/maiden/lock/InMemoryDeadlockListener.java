@@ -18,13 +18,12 @@ package com.toolazydogs.maiden.lock;
 
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
-import java.lang.ref.WeakReference;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
@@ -33,6 +32,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.toolazydogs.maiden.api.IronListener;
+import com.toolazydogs.maiden.util.WeakIdentityHashMap;
 
 
 /**
@@ -43,7 +43,7 @@ public class InMemoryDeadlockListener implements IronListener
     private final static String CLASS_NAME = InMemoryDeadlockListener.class.getName();
     private final static Logger LOGGER = Logger.getLogger(CLASS_NAME);
     private final static int NOT_USED = -1;
-    private final ScheduledThreadPoolExecutor pool = new ScheduledThreadPoolExecutor(6, new ThreadFactory()
+    private final ScheduledExecutorService pool = Executors.newSingleThreadScheduledExecutor(new ThreadFactory()
     {
         public Thread newThread(Runnable r)
         {
@@ -56,12 +56,12 @@ public class InMemoryDeadlockListener implements IronListener
         }
     });
     private final ReferenceQueue<Object> referenceQueue = new ReferenceQueue<Object>();
-    private final Map<Wrapper, Lock> wrappers = new HashMap<Wrapper, Lock>();
+    private final WeakIdentityHashMap<Object, Lock> locks = new WeakIdentityHashMap<Object, Lock>();
     private final Set<LockListener> listeners = new CopyOnWriteArraySet<LockListener>();
 
     public InMemoryDeadlockListener()
     {
-        pool.execute(new Runnable()
+        pool.scheduleWithFixedDelay(new Runnable()
         {
             /**
              * Daemon thread to keep our collection of objects tidy
@@ -69,21 +69,14 @@ public class InMemoryDeadlockListener implements IronListener
             @SuppressWarnings({"unchecked"})
             public void run()
             {
-                boolean done = false;
-                while (!done)
+                assert Thread.currentThread().isDaemon();
+
+                synchronized (locks)
                 {
-                    try
-                    {
-                        Reference<Object> reference = (Reference<Object>)referenceQueue.remove();
-                        assert wrappers.remove(new Wrapper(reference)) != null;
-                    }
-                    catch (InterruptedException e)
-                    {
-                        done = true;
-                    }
+                    locks.purge();
                 }
             }
-        });
+        }, 10, 10, TimeUnit.MILLISECONDS);
     }
 
     public Set<LockListener> getListeners()
@@ -295,21 +288,21 @@ public class InMemoryDeadlockListener implements IronListener
             lock.locked = null;
 
             pool.schedule(new Runnable()
-                          {
-                              public void run()
-                              {
-                                  synchronized (lock)
-                                  {
-                                      if (waitQueue.remove(waiting))
-                                      {
-                                          waitBroken.set(true);
-                                          lock.notifyAll();
+            {
+                public void run()
+                {
+                    synchronized (lock)
+                    {
+                        if (waitQueue.remove(waiting))
+                        {
+                            waitBroken.set(true);
+                            lock.notifyAll();
 
-                                          if (LOGGER.isLoggable(Level.FINEST)) LOGGER.finest("Wait lock broken on " + System.identityHashCode(object));
-                                      }
-                                  }
-                              }
-                          }, 1000000 * milliseconds + nanoseconds, TimeUnit.NANOSECONDS);
+                            if (LOGGER.isLoggable(Level.FINEST)) LOGGER.finest("Wait lock broken on " + System.identityHashCode(object));
+                        }
+                    }
+                }
+            }, 1000000 * milliseconds + nanoseconds, TimeUnit.NANOSECONDS);
 
             if (LOGGER.isLoggable(Level.FINEST)) LOGGER.finest("Entering wait on " + System.identityHashCode(object));
 
@@ -402,10 +395,12 @@ public class InMemoryDeadlockListener implements IronListener
 
     private synchronized Lock fetchLock(Object object)
     {
-        Wrapper wrapper = new Wrapper(new WeakReference<Object>(object, referenceQueue));
-        Lock lock = wrappers.get(wrapper);
-        if (lock == null) wrappers.put(wrapper, lock = new Lock());
-        return lock;
+        synchronized (locks)
+        {
+            Lock lock = locks.get(object);
+            if (lock == null) locks.put(object, lock = new Lock());
+            return lock;
+        }
     }
 
     private void broadcastWait(Object object)

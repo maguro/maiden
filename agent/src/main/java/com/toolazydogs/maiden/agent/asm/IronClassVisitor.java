@@ -18,6 +18,7 @@ package com.toolazydogs.maiden.agent.asm;
 
 import java.util.logging.Logger;
 
+import com.toolazydogs.maiden.agent.IronAgent;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
 import org.objectweb.asm.ClassVisitor;
@@ -26,8 +27,6 @@ import org.objectweb.asm.MethodAdapter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
-
-import com.toolazydogs.maiden.agent.IronAgent;
 
 
 /**
@@ -73,6 +72,10 @@ public class IronClassVisitor implements ClassVisitor, Opcodes
         boolean isSynchronized = (access & ACC_SYNCHRONIZED) != 0;
         boolean isStatic = (access & ACC_STATIC) != 0;
         MethodVisitor mv;
+
+        /**
+         * If native method prefix is supported we inject our own wrapper method.
+         */
         if (nativeMethodPrefixSupported && isNative)
         {
             delegate.visitMethod(access, IronAgent.NATIVE_METHOD_PREFIX + name, desc, signature, exceptions);
