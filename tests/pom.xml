@@ -8,6 +8,7 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
+    <groupId>com.toolazydogs.maiden.tests</groupId>
     <artifactId>tests</artifactId>
     <packaging>pom</packaging>
     <name>Iron Maiden :: Tests</name>
@@ -16,6 +17,7 @@
 
     <modules>
         <module>commandline</module>
+        <module>mocks</module>
     </modules>
 
 </project>

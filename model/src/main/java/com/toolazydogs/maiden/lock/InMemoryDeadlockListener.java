@@ -16,7 +16,6 @@
  */
 package com.toolazydogs.maiden.lock;
 
-import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -24,7 +23,6 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -421,33 +419,6 @@ public class InMemoryDeadlockListener implements IronListener
     private void broadcastUnlock(Object object)
     {
         for (LockListener listener : listeners) listener.unlock(object);
-    }
-
-    static class Wrapper
-    {
-        final Reference reference;
-
-        Wrapper(Reference reference)
-        {
-            assert reference != null;
-            this.reference = reference;
-        }
-
-        @Override
-        public boolean equals(Object o)
-        {
-            assert o instanceof Wrapper;
-
-            Wrapper wrapper = (Wrapper)o;
-
-            return System.identityHashCode(reference.get()) == System.identityHashCode(wrapper.reference.get());
-        }
-
-        @Override
-        public int hashCode()
-        {
-            return System.identityHashCode(reference.get());
-        }
     }
 
     private static class Lock

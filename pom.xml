@@ -30,7 +30,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <asmVersion>3.2</asmVersion>
+        <asmVersion>3.3.1</asmVersion>
     </properties>
 
     <dependencyManagement>
@@ -75,6 +75,12 @@
             <dependency>
                 <groupId>com.toolazydogs.maiden</groupId>
                 <artifactId>model</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.toolazydogs.maiden.tests</groupId>
+                <artifactId>mocks</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

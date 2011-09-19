@@ -14,15 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.toolazydogs.maiden.model;
+package com.acme;
+
+import java.util.logging.Logger;
+
 
 /**
  *
  */
-public class StartMethodDesc extends MethodDesc
+public class MockRunnable implements Runnable
 {
-    public StartMethodDesc()
+    private final static String CLASS_NAME = MockRunnable.class.getName();
+    private final static Logger LOGGER = Logger.getLogger(CLASS_NAME);
+
+    public void run()
     {
-        super("<start>", "<method>", "<desc>");
+        LOGGER.entering(CLASS_NAME, "run");
+
+        LOGGER.exiting(CLASS_NAME, "run");
     }
 }

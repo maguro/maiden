@@ -40,6 +40,8 @@ public class Tests
     {
         print("target/test-classes/com/acme/Pojo.class", "com.acme.Pojo");
         print("target/test-classes/com/acme/Pojo$1.class", "com.acme.Pojo$1");
+        print("target/test-classes/com/acme/Pojo$2.class", "com.acme.Pojo$2");
+        print("target/test-classes/com/acme/Pojo$TestRunnable.class", "com.acme.Pojo$2");
     }
 
     private static void print(String filename, String clazz) throws Exception

@@ -18,7 +18,7 @@ package com.toolazydogs.maiden.agent.asm;
 
 import java.util.logging.Logger;
 
-import com.toolazydogs.maiden.agent.IronAgent;
+import static com.toolazydogs.maiden.agent.asm.AsmUtils.push;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
 import org.objectweb.asm.ClassVisitor;
@@ -27,6 +27,8 @@ import org.objectweb.asm.MethodAdapter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
+
+import com.toolazydogs.maiden.agent.IronAgent;
 
 
 /**
@@ -104,7 +106,7 @@ public class IronClassVisitor implements ClassVisitor, Opcodes
                     @Override
                     public void begin(MethodVisitor visitor)
                     {
-                        AsmUtils.push(visitor, line);
+                        push(visitor, line);
                         visitor.visitLdcInsn(classType);
                         visitor.visitMethodInsn(INVOKESTATIC, "com/toolazydogs/maiden/IronMaiden", "lockObject", "(ILjava/lang/Object;)V");
                     }
@@ -112,7 +114,7 @@ public class IronClassVisitor implements ClassVisitor, Opcodes
                     @Override
                     public void end(MethodVisitor visitor)
                     {
-                        AsmUtils.push(visitor, line);
+                        push(visitor, line);
                         visitor.visitLdcInsn(classType);
                         visitor.visitMethodInsn(INVOKESTATIC, "com/toolazydogs/maiden/IronMaiden", "unlockObject", "(ILjava/lang/Object;)V");
                     }
@@ -126,7 +128,7 @@ public class IronClassVisitor implements ClassVisitor, Opcodes
                     @Override
                     public void begin(MethodVisitor visitor)
                     {
-                        AsmUtils.push(visitor, line);
+                        push(visitor, line);
                         visitor.visitVarInsn(ALOAD, 0);
                         visitor.visitMethodInsn(INVOKESTATIC, "com/toolazydogs/maiden/IronMaiden", "lockObject", "(ILjava/lang/Object;)V");
                     }
@@ -134,7 +136,7 @@ public class IronClassVisitor implements ClassVisitor, Opcodes
                     @Override
                     public void end(MethodVisitor visitor)
                     {
-                        AsmUtils.push(visitor, line);
+                        push(visitor, line);
                         visitor.visitVarInsn(ALOAD, 0);
                         visitor.visitMethodInsn(INVOKESTATIC, "com/toolazydogs/maiden/IronMaiden", "unlockObject", "(ILjava/lang/Object;)V");
                     }
@@ -156,7 +158,7 @@ public class IronClassVisitor implements ClassVisitor, Opcodes
             @Override
             public void end(MethodVisitor visitor)
             {
-                AsmUtils.push(visitor, line);
+                push(visitor, line);
                 visitor.visitMethodInsn(INVOKESTATIC, "com/toolazydogs/maiden/IronMaiden", "pop", "(I)V");
             }
         });

@@ -68,6 +68,12 @@
             <artifactId>model</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.toolazydogs.maiden.tests</groupId>
+            <artifactId>mocks</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
 </project>

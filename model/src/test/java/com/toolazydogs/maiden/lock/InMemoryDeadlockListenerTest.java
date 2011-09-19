@@ -16,12 +16,6 @@
  */
 package com.toolazydogs.maiden.lock;
 
-import java.lang.ref.ReferenceQueue;
-import java.lang.ref.WeakReference;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.testng.Assert.assertSame;
 import org.testng.annotations.Test;
 
 
@@ -31,15 +25,7 @@ import org.testng.annotations.Test;
 public class InMemoryDeadlockListenerTest
 {
     @Test
-    public void testWrapper()
+    public void testEmpty()
     {
-        Map<InMemoryDeadlockListener.Wrapper, Object> wrappers = new HashMap<InMemoryDeadlockListener.Wrapper, Object>();
-        ReferenceQueue<Object> referenceQueue = new ReferenceQueue<Object>();
-        Object object = "TEST";
-
-        InMemoryDeadlockListener.Wrapper wrapper = new InMemoryDeadlockListener.Wrapper(new WeakReference<Object>(object, referenceQueue));
-        wrappers.put(wrapper, object);
-
-        assertSame(wrappers.get(wrapper), object);
     }
 }

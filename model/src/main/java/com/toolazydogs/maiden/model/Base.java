@@ -18,11 +18,12 @@ package com.toolazydogs.maiden.model;
 
 import java.util.logging.Logger;
 
+
 /**
  *
  */
 public abstract class Base
 {
-  private final static String CLASS_NAME = Base.class.getName();
-  private final static Logger LOGGER = Logger.getLogger(CLASS_NAME);
+    private final static String CLASS_NAME = Base.class.getName();
+    private final static Logger LOGGER = Logger.getLogger(CLASS_NAME);
 }

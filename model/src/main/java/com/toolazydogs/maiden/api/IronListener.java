@@ -16,9 +16,6 @@
  */
 package com.toolazydogs.maiden.api;
 
-import com.toolazydogs.maiden.model.Line;
-
-
 /**
  *
  */

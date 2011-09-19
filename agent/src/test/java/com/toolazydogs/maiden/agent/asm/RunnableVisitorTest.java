@@ -14,15 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.toolazydogs.maiden.model;
+package com.toolazydogs.maiden.agent.asm;
+
+import com.acme.InheritedRunnable;
+import static org.testng.Assert.assertTrue;
+import org.testng.annotations.Test;
+
 
 /**
  *
  */
-public class StartMethodDesc extends MethodDesc
+public class RunnableVisitorTest
 {
-    public StartMethodDesc()
+    @Test
+    public void testSimple() throws Exception
     {
-        super("<start>", "<method>", "<desc>");
+        Object runnable = new InheritedRunnable();
+        assertTrue(Runnable.class.isAssignableFrom(runnable.getClass()));
     }
 }

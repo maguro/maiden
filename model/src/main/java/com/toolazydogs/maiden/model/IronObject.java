@@ -16,8 +16,6 @@
  */
 package com.toolazydogs.maiden.model;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Logger;
 
 

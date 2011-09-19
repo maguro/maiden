@@ -16,9 +16,6 @@
  */
 package com.toolazydogs.maiden.lock;
 
-import java.util.logging.Logger;
-
-
 /**
  *
  */

@@ -14,15 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.toolazydogs.maiden.model;
+package com.acme;
+
+import java.util.logging.Logger;
+
 
 /**
  *
  */
-public class StartMethodDesc extends MethodDesc
+public class InheritedRunnable extends MockRunnable
 {
-    public StartMethodDesc()
+    private final static String CLASS_NAME = InheritedRunnable.class.getName();
+    private final static Logger LOGGER = Logger.getLogger(CLASS_NAME);
+
+    @Override
+    public void run()
     {
-        super("<start>", "<method>", "<desc>");
+        super.run();    //Todo change body of overridden methods use File | Settings | File Templates.
     }
 }
