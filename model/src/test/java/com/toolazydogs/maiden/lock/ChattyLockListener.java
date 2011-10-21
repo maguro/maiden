@@ -22,8 +22,50 @@ import java.util.logging.Logger;
 /**
  * @version $Revision: $ $Date: $
  */
-public class ChattyLockListener
+public class ChattyLockListener implements LockListener
 {
     private final static String CLASS_NAME = ChattyLockListener.class.getName();
     private final static Logger LOGGER = Logger.getLogger(CLASS_NAME);
+
+    public synchronized void waiting(Object object)
+    {
+        LOGGER.info(Thread.currentThread().getName() + ": WAITING");
+        System.err.println(Thread.currentThread().getName() + ": WAITING");
+        System.err.flush();
+    }
+
+    public synchronized void interrupted(Object object)
+    {
+        LOGGER.info(Thread.currentThread().getName() + ": INTERRUPTED");
+        System.err.println(Thread.currentThread().getName() + ": INTERRUPTED");
+        System.err.flush();
+    }
+
+    public synchronized void timeout(Object object)
+    {
+        LOGGER.info(Thread.currentThread().getName() + ": TIMEOUT");
+        System.err.println(Thread.currentThread().getName() + ": TIMEOUT");
+        System.err.flush();
+    }
+
+    public synchronized void obtained(Object object)
+    {
+        LOGGER.info(Thread.currentThread().getName() + ": OBTAINED");
+        System.err.println(Thread.currentThread().getName() + ": OBTAINED");
+        System.err.flush();
+    }
+
+    public synchronized void lock(Object object)
+    {
+        LOGGER.info(Thread.currentThread().getName() + ": LOCK");
+        System.err.println(Thread.currentThread().getName() + ": LOCK");
+        System.err.flush();
+    }
+
+    public synchronized void unlock(Object object)
+    {
+        LOGGER.info(Thread.currentThread().getName() + ": UNLOCK");
+        System.err.println(Thread.currentThread().getName() + ": UNLOCK");
+        System.err.flush();
+    }
 }

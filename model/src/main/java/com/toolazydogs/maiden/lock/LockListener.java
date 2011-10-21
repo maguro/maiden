@@ -23,6 +23,10 @@ public interface LockListener
 {
     void waiting(Object object);
 
+    void interrupted(Object object);
+    
+    void timeout(Object object);
+    
     void obtained(Object object);
 
     void lock(Object object);

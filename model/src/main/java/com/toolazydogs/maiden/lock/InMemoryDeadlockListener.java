@@ -16,12 +16,12 @@
  */
 package com.toolazydogs.maiden.lock;
 
-import java.lang.ref.ReferenceQueue;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
@@ -30,7 +30,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.toolazydogs.maiden.api.DoNothingIronListener;
-import com.toolazydogs.maiden.api.IronListener;
 import com.toolazydogs.maiden.util.WeakIdentityHashMap;
 
 
@@ -54,7 +53,6 @@ public class InMemoryDeadlockListener extends DoNothingIronListener
             return thread;
         }
     });
-    private final ReferenceQueue<Object> referenceQueue = new ReferenceQueue<Object>();
     private final WeakIdentityHashMap<Object, Lock> locks = new WeakIdentityHashMap<Object, Lock>();
     private final Set<LockListener> listeners = new CopyOnWriteArraySet<LockListener>();
 
@@ -94,6 +92,8 @@ public class InMemoryDeadlockListener extends DoNothingIronListener
         {
             if (lock.locked == Thread.currentThread())
             {
+                assert lock.count > 0;
+
                 lock.count++;
                 if (LOGGER.isLoggable(Level.FINEST)) LOGGER.finest("INCREMENTED lock count on " + System.identityHashCode(object) + " to " + lock.count);
             }
@@ -101,7 +101,7 @@ public class InMemoryDeadlockListener extends DoNothingIronListener
             {
                 if (LOGGER.isLoggable(Level.FINEST)) LOGGER.finest("WAITING " + System.identityHashCode(object) + " by " + lock.locked);
 
-                Waiting waiting = new Waiting(NOT_USED);
+                Waiting waiting = new Waiting();
                 Queue<Waiting> locking = lock.getLockingQueue();
                 locking.add(waiting);
 
@@ -113,14 +113,19 @@ public class InMemoryDeadlockListener extends DoNothingIronListener
                     try
                     {
                         lock.wait();
-                        if (locking.peek() == waiting)
+                        if (lock.nextLocker == waiting)
                         {
                             done = true;
-                            locking.poll();
+                            lock.nextLocker = null;
                         }
                     }
-                    catch (InterruptedException e)
+                    catch (InterruptedException ie)
                     {
+                        /**
+                         * We're simulating a real lock and so we should not
+                         * jump out of this loop.  Simply reset the interrupt
+                         * and continue to wait.
+                         */
                         Thread.currentThread().interrupt();
                     }
                 }
@@ -156,6 +161,7 @@ public class InMemoryDeadlockListener extends DoNothingIronListener
         synchronized (lock)
         {
             assert lock.locked == Thread.currentThread();
+            assert lock.count > 0;
 
             if (LOGGER.isLoggable(Level.FINEST)) LOGGER.finest("DECREMENTED lock count on " + System.identityHashCode(object) + " to " + (lock.count - 1));
 
@@ -167,12 +173,13 @@ public class InMemoryDeadlockListener extends DoNothingIronListener
 
                 broadcastUnlock(object);
 
-                if (!lock.getLockingQueue().isEmpty())
-                {
-                    if (LOGGER.isLoggable(Level.FINEST)) LOGGER.finest("Notifying all lock waiters on " + System.identityHashCode(object));
+                Queue<Waiting> locking = lock.getLockingQueue();
 
-                    lock.notifyAll();
-                }
+                assert lock.nextLocker == null;
+                lock.nextLocker = locking.poll();
+                if (LOGGER.isLoggable(Level.FINEST)) LOGGER.finest("Notifying all lock waiters on " + System.identityHashCode(object));
+
+                lock.notifyAll();
             }
         }
 
@@ -191,7 +198,7 @@ public class InMemoryDeadlockListener extends DoNothingIronListener
         Waiting waiting = new Waiting(lock.count);
         synchronized (lock)
         {
-            Queue<Waiting> waitQueue = lock.getWaitQueue();
+            Queue<Waiting> waitQueue = lock.getWaitingQueue();
             Queue<Waiting> lockQueue = lock.getLockingQueue();
             waitQueue.add(waiting);
 
@@ -200,34 +207,70 @@ public class InMemoryDeadlockListener extends DoNothingIronListener
             lock.count = 0;
             lock.locked = null;
 
+            if (lock.nextLocker == null) lock.nextLocker = lockQueue.poll();
+
+            boolean interrupted = false;
             boolean done = false;
             while (!done)
             {
-                lock.wait();
-                if (waitQueue.peek() == waiting)
+                lock.notifyAll();
+                try
                 {
-                    done = true;
-                    lockQueue.add(waitQueue.poll());
+                    lock.wait();
+                    if (!waitQueue.contains(waiting))
+                    {
+                        done = true;
+                    }
+                }
+                catch (InterruptedException ie)
+                {
+                    /**
+                     * If we're interrupted then we need to remove the thread 
+                     * from the waiting queue.
+                     */
+                    interrupted = true;
+                    waitQueue.remove(waiting);
+                    lockQueue.add(waiting);
                 }
             }
+
+            broadcastWait(object);
 
             done = false;
             while (!done)
             {
-                lock.wait();
-                if (lockQueue.peek() == waiting)
+                if (lock.nextLocker == waiting)
                 {
                     done = true;
+                    lock.nextLocker = null;
 
                     /**
                      * We are resuming a lock and so we should restore its count.
                      */
                     lock.locked = Thread.currentThread();
-                    lock.count = lockQueue.poll().count;
+                    lock.count = waiting.count;
+                }
+                else
+                {
+                    try
+                    {
+                        lock.wait();
+                    }
+                    catch (InterruptedException ignored)
+                    {
+                        /**
+                         * We're waiting for the lock, not waiting for a 
+                         * notification.  Simply reset the interrupt
+                         * and continue to wait.
+                         */
+                        if (!interrupted) Thread.currentThread().interrupt();
+                    }
                 }
             }
 
-            broadcastLock(object);
+            broadcastObtained(object);
+
+            if (interrupted) throw new InterruptedException();
         }
 
         LOGGER.exiting(CLASS_NAME, "waitStart");
@@ -254,8 +297,9 @@ public class InMemoryDeadlockListener extends DoNothingIronListener
         final Waiting waiting = new Waiting(lock.count);
         synchronized (lock)
         {
+            final Thread me = Thread.currentThread();
             final AtomicBoolean waitBroken = new AtomicBoolean(false);
-            final Queue<Waiting> waitQueue = lock.getWaitQueue();
+            final Queue<Waiting> waitQueue = lock.getWaitingQueue();
             final Queue<Waiting> lockQueue = lock.getLockingQueue();
             waitQueue.add(waiting);
 
@@ -264,19 +308,16 @@ public class InMemoryDeadlockListener extends DoNothingIronListener
             lock.count = 0;
             lock.locked = null;
 
-            pool.schedule(new Runnable()
+            Future handle = pool.schedule(new Runnable()
             {
                 public void run()
                 {
                     synchronized (lock)
                     {
-                        if (waitQueue.remove(waiting))
-                        {
-                            waitBroken.set(true);
-                            lock.notifyAll();
+                        waitBroken.set(true);
+                        me.interrupt();
 
-                            if (LOGGER.isLoggable(Level.FINEST)) LOGGER.finest("Wait lock broken on " + System.identityHashCode(object));
-                        }
+                        if (LOGGER.isLoggable(Level.FINEST)) LOGGER.finest("Wait lock broken on " + System.identityHashCode(object));
                     }
                 }
             }, 1000000 * milliseconds + nanoseconds, TimeUnit.NANOSECONDS);
@@ -286,13 +327,37 @@ public class InMemoryDeadlockListener extends DoNothingIronListener
             boolean done = false;
             while (!done)
             {
-                lock.wait();
-                if (waitBroken.get() || waitQueue.peek() == waiting)
+                assert waitBroken.get() || waitQueue.contains(waiting);
+
+                try
                 {
-                    done = true;
-                    lockQueue.add(waiting);
+                    lock.wait();
+                    if (waitQueue.peek() == waiting)
+                    {
+                        done = true;
+                        lockQueue.add(waiting);
+                    }
+                }
+                catch (InterruptedException ie)
+                {
+                    /**
+                     * If we're interrupted then we need to remove the thread 
+                     * from the waiting queue.
+                     */
+                    waitQueue.remove(waiting);
+                    if (waitBroken.get())
+                    {
+                        done = true;
+                        lockQueue.add(waiting);
+                    }
+                    else
+                    {
+                        throw ie;
+                    }
                 }
             }
+
+            handle.cancel(false);
 
             if (LOGGER.isLoggable(Level.FINEST))
             {
@@ -303,7 +368,8 @@ public class InMemoryDeadlockListener extends DoNothingIronListener
             done = false;
             while (!done)
             {
-                lock.wait();
+                assert lockQueue.contains(waiting);
+
                 if (lockQueue.peek() == waiting)
                 {
                     done = true;
@@ -314,11 +380,27 @@ public class InMemoryDeadlockListener extends DoNothingIronListener
                     lock.locked = Thread.currentThread();
                     lock.count = lockQueue.poll().count;
                 }
+                else
+                {
+                    try
+                    {
+                        lock.wait();
+                    }
+                    catch (InterruptedException ie)
+                    {
+                        /**
+                         * If we're interrupted then we need to remove the thread 
+                         * from the locking queue.
+                         */
+                        lockQueue.remove(waiting);
+                        throw ie;
+                    }
+                }
             }
 
             if (LOGGER.isLoggable(Level.FINEST)) LOGGER.finest("RESTORED " + System.identityHashCode(object) + " by " + lock.locked);
 
-            broadcastLock(object);
+            broadcastObtained(object);
         }
 
         LOGGER.exiting(CLASS_NAME, "waitStart");
@@ -335,9 +417,9 @@ public class InMemoryDeadlockListener extends DoNothingIronListener
 
         synchronized (lock)
         {
-            Queue<Waiting> queue = lock.getWaitQueue();
+            Queue<Waiting> waitQueue = lock.getWaitingQueue();
 
-            Waiting waiting = queue.poll();
+            Waiting waiting = waitQueue.poll();
             if (waiting != null)
             {
                 lock.getLockingQueue().add(waiting);
@@ -359,10 +441,11 @@ public class InMemoryDeadlockListener extends DoNothingIronListener
 
         synchronized (lock)
         {
-            Queue<Waiting> queue = lock.getWaitQueue();
+            Queue<Waiting> waitQueue = lock.getWaitingQueue();
+            Queue<Waiting> lockQueue = lock.getLockingQueue();
 
-            lock.getLockingQueue().addAll(queue);
-            queue.clear();
+            lockQueue.addAll(waitQueue);
+            waitQueue.clear();
 
             lock.notifyAll();
         }
@@ -402,15 +485,19 @@ public class InMemoryDeadlockListener extends DoNothingIronListener
 
     private static class Lock
     {
-        Queue<Waiting> wait = null;
+        // Queue of threads waiting to be notified
+        Queue<Waiting> waiting = null;
+        Waiting nextWaiter = null;
+        // Queue of threads waiting for access to a lock
         Queue<Waiting> locking = null;
+        Waiting nextLocker = null;
         Thread locked = null;
         int count = 0;
 
-        Queue<Waiting> getWaitQueue()
+        Queue<Waiting> getWaitingQueue()
         {
-            if (wait == null) wait = new LinkedList<Waiting>();
-            return wait;
+            if (waiting == null) waiting = new LinkedList<Waiting>();
+            return waiting;
         }
 
         Queue<Waiting> getLockingQueue()
@@ -422,7 +509,13 @@ public class InMemoryDeadlockListener extends DoNothingIronListener
 
     private static class Waiting
     {
+        // saved lock count
         final int count;
+
+        private Waiting()
+        {
+            this(NOT_USED);
+        }
 
         private Waiting(int count)
         {
