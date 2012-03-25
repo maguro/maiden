@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.toolazydogs.maiden.tests;
+package com.toolazydogs.maiden.agent.asm;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -27,8 +27,6 @@ import org.objectweb.asm.util.CheckClassAdapter;
 import org.objectweb.asm.util.TraceClassVisitor;
 import org.testng.annotations.Test;
 
-import com.toolazydogs.maiden.agent.asm.IronClassVisitor;
-
 
 /**
  *
@@ -39,9 +37,9 @@ public class Tests
     public void t() throws Exception
     {
         print("target/test-classes/com/acme/Pojo.class", "com.acme.Pojo");
-        print("target/test-classes/com/acme/Pojo$1.class", "com.acme.Pojo$1");
-        print("target/test-classes/com/acme/Pojo$2.class", "com.acme.Pojo$2");
-        print("target/test-classes/com/acme/Pojo$TestRunnable.class", "com.acme.Pojo$2");
+//        print("target/test-classes/com/acme/Pojo$1.class", "com.acme.Pojo$1");
+//        print("target/test-classes/com/acme/Pojo$2.class", "com.acme.Pojo$2");
+//        print("target/test-classes/com/acme/Pojo$TestRunnable.class", "com.acme.Pojo$2");
     }
 
     private static void print(String filename, String clazz) throws Exception
@@ -66,7 +64,12 @@ public class Tests
         writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
         reader.accept(new CheckClassAdapter(writer), ClassReader.EXPAND_FRAMES);
 
-        reader = new ClassReader(writer.toByteArray());
+        print(writer.toByteArray());
+    }
+
+    private static void print(byte[] b)
+    {
+        ClassReader reader = new ClassReader(b);
         reader.accept(new TraceClassVisitor(null, new PrintWriter(System.out)), ClassReader.EXPAND_FRAMES);
     }
 }

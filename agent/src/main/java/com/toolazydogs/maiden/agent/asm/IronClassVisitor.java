@@ -176,7 +176,10 @@ public class IronClassVisitor implements ClassVisitor, Opcodes
             {
                 adapter.visitVarInsn(param.getOpcode(ILOAD), args++);
             }
-            adapter.visitMethodInsn((isStatic ? INVOKESTATIC : INVOKEVIRTUAL), clazz.replaceAll("\\.", "/"), name, desc);
+//            adapter.visitMethodInsn((isStatic ? INVOKESTATIC : INVOKEVIRTUAL), clazz.replaceAll("\\.", "/"), name, desc);
+            System.err.println("BEFORE " + clazz + "." + name);
+            adapter.visitMethodInsn((isStatic ? INVOKESTATIC : INVOKEVIRTUAL), clazz.replaceAll("\\.", "/"), IronAgent.NATIVE_METHOD_PREFIX + name, desc);
+            System.err.println("AFTER " + IronAgent.NATIVE_METHOD_PREFIX + name);
 
             adapter.visitInsn(RETURN);
             adapter.visitEnd();

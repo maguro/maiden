@@ -16,14 +16,16 @@
  */
 package com.toolazydogs.maiden.agent;
 
+import java.io.PrintWriter;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
 import java.util.logging.Logger;
 
-import org.objectweb.asm.Opcodes;
-
 import com.toolazydogs.maiden.agent.api.Dispatcher;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.util.TraceClassVisitor;
 
 
 /**
@@ -52,14 +54,34 @@ public final class IronTransformer implements ClassFileTransformer, Opcodes
 
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException
     {
-        LOGGER.entering(CLASS_NAME, "transform", new Object[]{loader, className, classBeingRedefined, protectionDomain, classfileBuffer});
+        byte[] results = new byte[0];
+        try
+        {
+            LOGGER.entering(CLASS_NAME, "transform", new Object[]{loader, className, classBeingRedefined, protectionDomain, classfileBuffer});
 
-        ClassFileTransformer transformer = dispatcher.lookup(loader, className, classBeingRedefined, protectionDomain, nativeMethodPrefixSupported);
+            ClassFileTransformer transformer = dispatcher.lookup(loader, className, classBeingRedefined, protectionDomain, nativeMethodPrefixSupported);
 
-        byte[] results = transformer.transform(loader, className, classBeingRedefined, protectionDomain, classfileBuffer);
+            results = transformer.transform(loader, className, classBeingRedefined, protectionDomain, classfileBuffer);
 
-        LOGGER.exiting(CLASS_NAME, "transform", results);
+            System.err.println("TRANSFORMED "  + className);
+            if ("java/util/zip/ZipFile".equals(className))
+            {
+                print(results);
+            }
+
+            LOGGER.exiting(CLASS_NAME, "transform", results);
+        }
+        catch (Throwable e)
+        {
+            e.printStackTrace();  //Todo change body of catch statement use File | Settings | File Templates.
+        }
 
         return results;
+    }
+
+    private static void print(byte[] b)
+    {
+        ClassReader reader = new ClassReader(b);
+        reader.accept(new TraceClassVisitor(null, new PrintWriter(System.out)), ClassReader.EXPAND_FRAMES);
     }
 }

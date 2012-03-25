@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import com.sun.tools.example.debug.gui.ThreadTreeTool;
 import com.toolazydogs.maiden.IronMaiden;
 import com.toolazydogs.maiden.model.Event;
 import com.toolazydogs.maiden.model.Line;
