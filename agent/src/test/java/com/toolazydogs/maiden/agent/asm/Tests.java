@@ -36,7 +36,7 @@ public class Tests
     @Test
     public void t() throws Exception
     {
-        print("target/test-classes/com/acme/Pojo.class", "com.acme.Pojo");
+//        print("target/test-classes/com/acme/Pojo.class", "com.acme.Pojo");
 //        print("target/test-classes/com/acme/Pojo$1.class", "com.acme.Pojo$1");
 //        print("target/test-classes/com/acme/Pojo$2.class", "com.acme.Pojo$2");
 //        print("target/test-classes/com/acme/Pojo$TestRunnable.class", "com.acme.Pojo$2");
@@ -70,6 +70,6 @@ public class Tests
     private static void print(byte[] b)
     {
         ClassReader reader = new ClassReader(b);
-        reader.accept(new TraceClassVisitor(null, new PrintWriter(System.out)), ClassReader.EXPAND_FRAMES);
+        reader.accept(new TraceClassVisitor(null, new PrintWriter(System.err)), ClassReader.EXPAND_FRAMES);
     }
 }

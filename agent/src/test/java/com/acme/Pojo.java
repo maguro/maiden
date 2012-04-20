@@ -19,6 +19,7 @@ package com.acme;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.zip.DataFormatException;
 
 import com.toolazydogs.maiden.IronMaiden;
 import com.toolazydogs.maiden.model.Event;
@@ -62,7 +63,7 @@ public class Pojo
     {
     }
 
-    public synchronized native void setName(String name, int j) throws Exception;
+    public synchronized native String getName(String name, int j) throws Exception;
 
     public native static void z_a(String name, int j) throws Exception;
 
@@ -128,8 +129,22 @@ public class Pojo
 //        }
     }
 
+    private static long inflateBytesWrapper(long addr, String str, int len)
+	    throws DataFormatException
+    {
+        return inflateBytes(addr, str, len);
+    }
+
+    private static long inflateBytes(long addr, String str, int len)
+	    throws DataFormatException
+    {
+        return 0;
+    }
+
     public void foo(byte[] array) throws Exception
     {
+        inflateBytesWrapper(1, "foo", 3);
+
         LOGGER.wait();
         vInteger = vint = 2;
         Pojo pojo = new Pojo();
@@ -144,7 +159,7 @@ public class Pojo
         {
             System.err.println("ENTER " + Thread.currentThread().getId());
 
-            setName("test", 9);
+            getName("test", 9);
 
             int size = array.length;
             int hash = array.hashCode();

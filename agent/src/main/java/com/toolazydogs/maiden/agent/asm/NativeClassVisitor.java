@@ -18,8 +18,6 @@ package com.toolazydogs.maiden.agent.asm;
 
 import java.util.logging.Logger;
 
-import static com.toolazydogs.maiden.agent.asm.AsmUtils.push;
-
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
 import org.objectweb.asm.ClassVisitor;
@@ -35,15 +33,15 @@ import com.toolazydogs.maiden.agent.IronAgent;
 /**
  * An ASM class visitor.
  */
-public class IronClassVisitor implements ClassVisitor, Opcodes
+public class NativeClassVisitor implements ClassVisitor, Opcodes
 {
-    private final static String CLASS_NAME = IronClassVisitor.class.getName();
+    private final static String CLASS_NAME = NativeClassVisitor.class.getName();
     private final static Logger LOGGER = Logger.getLogger(CLASS_NAME);
     private final String clazz;
     private final boolean nativeMethodPrefixSupported;
     private final ClassVisitor delegate;
 
-    public IronClassVisitor(String clazz, boolean nativeMethodPrefixSupported, ClassVisitor delegate)
+    public NativeClassVisitor(String clazz, boolean nativeMethodPrefixSupported, ClassVisitor delegate)
     {
         assert clazz != null;
         assert delegate != null;
@@ -92,79 +90,7 @@ public class IronClassVisitor implements ClassVisitor, Opcodes
 
         mv = new WaitNotifyMethodVisitor(mv);
 
-        BeginEndMethodVisitor bemv = new BeginEndMethodVisitor(mv, access, name, desc, signature, exceptions);
-
-        if (isSynchronized)
-        {
-            LOGGER.finest("Method is synchronized");
-
-            final Type classType = Type.getType("L" + clazz.replaceAll("\\.", "/") + ";.class");
-            if (isStatic)
-            {
-                LOGGER.finest("Method is static");
-                bemv.getListeners().add(new BeginEndMethodListener()
-                {
-                    @Override
-                    public void begin(MethodVisitor visitor)
-                    {
-                        push(visitor, line);
-                        visitor.visitLdcInsn(classType);
-                        visitor.visitMethodInsn(INVOKESTATIC, "com/toolazydogs/maiden/IronMaiden", "lockObject", "(ILjava/lang/Object;)V");
-                    }
-
-                    @Override
-                    public void end(MethodVisitor visitor)
-                    {
-                        push(visitor, line);
-                        visitor.visitLdcInsn(classType);
-                        visitor.visitMethodInsn(INVOKESTATIC, "com/toolazydogs/maiden/IronMaiden", "unlockObject", "(ILjava/lang/Object;)V");
-                    }
-                });
-            }
-            else
-            {
-                LOGGER.finest("Method is not static");
-                bemv.getListeners().add(new BeginEndMethodListener()
-                {
-                    @Override
-                    public void begin(MethodVisitor visitor)
-                    {
-                        push(visitor, line);
-                        visitor.visitVarInsn(ALOAD, 0);
-                        visitor.visitMethodInsn(INVOKESTATIC, "com/toolazydogs/maiden/IronMaiden", "lockObject", "(ILjava/lang/Object;)V");
-                    }
-
-                    @Override
-                    public void end(MethodVisitor visitor)
-                    {
-                        push(visitor, line);
-                        visitor.visitVarInsn(ALOAD, 0);
-                        visitor.visitMethodInsn(INVOKESTATIC, "com/toolazydogs/maiden/IronMaiden", "unlockObject", "(ILjava/lang/Object;)V");
-                    }
-                });
-            }
-        }
-
-        bemv.getListeners().add(new BeginEndMethodListener()
-        {
-            @Override
-            public void begin(MethodVisitor visitor)
-            {
-                visitor.visitLdcInsn(clazz);
-                visitor.visitLdcInsn(name);
-                visitor.visitLdcInsn(desc);
-                visitor.visitMethodInsn(INVOKESTATIC, "com/toolazydogs/maiden/IronMaiden", "push", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
-            }
-
-            @Override
-            public void end(MethodVisitor visitor)
-            {
-                push(visitor, line);
-                visitor.visitMethodInsn(INVOKESTATIC, "com/toolazydogs/maiden/IronMaiden", "pop", "(I)V");
-            }
-        });
-
-        MethodVisitor result = new MonitorMethodVisitor(bemv);
+        MethodVisitor result = mv;
 
         if (nativeMethodPrefixSupported && isNative)
         {

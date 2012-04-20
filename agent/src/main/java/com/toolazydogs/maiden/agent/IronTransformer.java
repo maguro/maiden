@@ -22,10 +22,11 @@ import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
 import java.util.logging.Logger;
 
-import com.toolazydogs.maiden.agent.api.Dispatcher;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.util.TraceClassVisitor;
+
+import com.toolazydogs.maiden.agent.api.Dispatcher;
 
 
 /**
@@ -63,9 +64,10 @@ public final class IronTransformer implements ClassFileTransformer, Opcodes
 
             results = transformer.transform(loader, className, classBeingRedefined, protectionDomain, classfileBuffer);
 
-            System.err.println("TRANSFORMED "  + className);
-            if ("java/util/zip/ZipFile".equals(className))
+//            System.err.println("TRANSFORMED " + className);
+            if ("java/lang/reflect/Proxy".equals(className))
             {
+                print(classfileBuffer);
                 print(results);
             }
 
