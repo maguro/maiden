@@ -25,8 +25,8 @@ import java.util.logging.Logger;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 
-import com.toolazydogs.maiden.agent.asm.RunnableVisitor;
 import com.toolazydogs.maiden.agent.asm.IronClassVisitor;
+import com.toolazydogs.maiden.agent.asm.RunnableVisitor;
 
 
 /**
@@ -48,7 +48,7 @@ public class DefaultTransformer implements ClassFileTransformer
         LOGGER.entering(CLASS_NAME, "transform", new Object[]{loader, className, classBeingRedefined, protectionDomain, classfileBuffer});
 
         ClassReader reader = new ClassReader(classfileBuffer);
-        ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
+        ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
         RunnableVisitor runnableVisitor = new RunnableVisitor(loader, writer);
         reader.accept(new IronClassVisitor(className, nativeMethodPrefixSupported, writer), ClassReader.EXPAND_FRAMES);
 

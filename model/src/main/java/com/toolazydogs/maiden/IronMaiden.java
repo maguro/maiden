@@ -64,7 +64,8 @@ public class IronMaiden
 
     public static void push(String classname, String name, String desc)
     {
-        if (INSIDE.get()) return;
+        boolean inside = INSIDE.get();
+        if (inside) return;
         else INSIDE.set(true);
 
         try
@@ -73,7 +74,7 @@ public class IronMaiden
         }
         finally
         {
-            INSIDE.set(false);
+            INSIDE.set(inside);
         }
     }
 

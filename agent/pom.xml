@@ -54,7 +54,18 @@
 
         <dependency>
             <groupId>asm</groupId>
+            <artifactId>asm-analysis</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>asm</groupId>
             <artifactId>asm-commons</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm-util</artifactId>
         </dependency>
 
         <dependency>
