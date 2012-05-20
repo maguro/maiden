@@ -38,7 +38,7 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>com.toolazydogs.maiden</groupId>
-                                    <artifactId>assemble</artifactId>
+                                    <artifactId>agent</artifactId>
                                     <version>${project.version}</version>
                                     <type>jar</type>
                                     <overWrite>true</overWrite>
