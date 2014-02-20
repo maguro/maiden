@@ -7,3 +7,5 @@ wrong in a multi-threaded environment will go wrong. It's a great tool to test
 programs that you think are thread safe.
 
 maiden 0.1.0
+
+.. image:: https://travis-ci.org/maguro/maiden.png   :target: https://travis-ci.org/maguro/maiden

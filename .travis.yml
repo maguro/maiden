@@ -1,0 +1,11 @@
+language: java
+
+java:
+  - 1.6
+
+script:
+  - mvn clean install -P tests
+
+notifications:
+  email:
+    - adc@toolazydogs.com
