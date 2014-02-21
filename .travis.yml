@@ -3,6 +3,10 @@ language: java
 java:
   - 1.6
 
+before_install:
+  - mvn -version
+  - echo $JAVA_HOME
+
 install:
   - mvn clean install -P tests,default-tools.jar
 
