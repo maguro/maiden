@@ -4,10 +4,10 @@ java:
   - 1.6
 
 install:
-  - mvn clean install -P tests
+  - mvn clean install -P tests,default-tools.jar
 
 script:
-  - mvn test -P tests
+  - mvn test -P tests,default-tools.jar
 
 notifications:
   email:
